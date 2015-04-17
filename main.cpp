@@ -8,8 +8,6 @@
 #include <set>
 #include "std/memory.hpp"
 
-namespace pstd = pico::pstd;
-
 #include <boost/iterator/indirect_iterator.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
@@ -30,13 +28,14 @@ typedef io::filtering_istream istream;
 
 namespace csv = pico::util::csv;
 
-#include "file/header.hpp"
+#include "header.hpp"
+#include "sync.hpp"
 
 namespace {
   std::unique_ptr<istream> OpenFile (const fs::path &path) {
-    std::unique_ptr<istream> ret = pstd::make_unique<istream> ();
-    io::file_source fileSrc (path.string ());
-    ret->push (fileSrc);
+    std::unique_ptr<istream> ret = pstd::make_unique<io::filtering_istream> ();
+    io::file_source fileSource (path.string ());
+    ret->push (fileSource);
     return ret;
   }
 
@@ -108,8 +107,7 @@ int main () {
 
   /***  Find the first sync point in each file
    */
-  typedef std::pair<InputRows::const_iterator, InputRows::const_iterator> Iters;
-  boost::optional<Iters> syncPoint;
+
 
   /* we're assuming the connections that created the files were established
    * at the same time.  if that's the case, then the first line in one
@@ -121,30 +119,40 @@ int main () {
    * then iterate through the right file.
    */
 
-  // Iterate left file looking for a sync point
-  for (auto it = std::begin (leftInput); !syncPoint && it != std::end (leftInput); ++it) {
-//        const auto &leftSeq = (*it)[1]->Repr ();
-//        const auto &rightSeq = rightInput.front ()[1]->Repr ();
-    if (Equ (*it, rightInput.front (), columns)) {
-      syncPoint = std::make_pair (it, rightInput.begin ());
-    }
+  SyncPoint syncPoint = FindSyncPoint (leftInput.begin (),
+                                       leftInput.end (),
+                                       rightInput.begin (),
+                                       rightInput.end (),
+                                       columns);
+  if (!syncPoint) {
+    std::cerr << "*** ERROR: Unable to find initial sync point between\n"
+    << "\t" << leftPath << "\n"
+    << "and...\n"
+    << "\t" << rightPath
+    << std::flush;
+    return 2;
   }
 
-  // If we haven't found the sync point, iterate the right file looking for a sync point
-  for (auto it = std::begin (rightInput); !syncPoint && it != std::end (rightInput); ++it) {
-//        const auto &rightSeq = (*it)[1]->Repr ();
-//        const auto &leftSeq = leftInput.front ()[1]->Repr ();
-    if (Equ (*it, leftInput.front (), columns)) {
-      syncPoint = std::make_pair (leftInput.begin (), it);
+  // Sync point found
+  std::clog << "Found sync point between left & right.\nLeft:\n"
+  << *(syncPoint->first) << "\n"
+  << "Right:\n"
+  << *(syncPoint->second) << "\n";
+
+  auto AtEnd = [&leftInput, &rightInput] (const SyncPoint &testSyncPoint) -> bool {
+    if (testSyncPoint->first == leftInput.end ()) {
+      if (testSyncPoint->second == rightInput.end ()) {
+        return true;
+      }
     }
+    return false;
+  };
+
+  while (!AtEnd (syncPoint)) {
+    // first create a merge row & send it out
+
   }
 
-  if (syncPoint) {
-    std::clog << "Found sync point between left & right.\nLeft:\n"
-    << *(syncPoint->first) << "\n"
-    << "Right:\n"
-    << *(syncPoint->second) << "\n";
-  }
 
   return 0;
 

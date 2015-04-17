@@ -3,6 +3,7 @@
 //
 
 #include <string>
+#include <algorithm>
 
 #ifndef QC_UTILITY_HPP
 #define QC_UTILITY_HPP

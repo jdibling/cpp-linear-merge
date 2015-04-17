@@ -4,9 +4,12 @@
 
 #ifndef QC_MEMORY_HPP
 #define QC_MEMORY_HPP
+
+#include <type_traits>
+#include <memory>
+
 // ===========================================================
 
-namespace pico {
 namespace pstd {
 
 template<typename T, typename... Args> typename std::enable_if<!std::is_array<T>::value, std::unique_ptr < T>>::type make_unique(Args && ...args)
@@ -29,15 +32,14 @@ template<typename T, typename... Args> typename std::enable_if<!std::is_array<T>
  * every element.  Aside from this being Undefined Behavior, it is also
  * going to return results that are potentially unexpected.
  */
+  /*
     template<typename T>
-    typename std::enable_if<std::is_array<T>::value, std::unique_ptr < T>>
-
-    ::type
+    typename std::enable_if<std::is_array<T>::value, std::unique_ptr < T>>::type
     make_unique(size_t n) {
         typedef typename std::remove_extent<T>::type Elem;
         return std::unique_ptr<T>(new Elem[n]());
     }
+    */
 // ===========================================================
-}
 }
 #endif //QC_MEMORY_HPP
