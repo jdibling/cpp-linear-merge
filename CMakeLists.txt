@@ -11,6 +11,6 @@ include_directories (${Boost_INCLUDE_DIRS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 set(SOURCE_FILES main.cpp)
-add_executable(lmerge ${SOURCE_FILES} Options.cpp Options.h std/memory.hpp util/csv.hpp header.hpp std/utility.hpp sync.hpp mergerow.hpp util/convert.hpp cell.hpp cell/cell.cpp cell/uint_cell.hpp cell/uint_cell.cpp cell/text_cell.hpp cell/text_cell.cpp column.hpp column/text_column.cpp column/column.cpp column/text_column.hpp column/uint_column.hpp column/uint_column.cpp input_row.hpp input_row/input_row.cpp)
+add_executable(lmerge ${SOURCE_FILES} Options.cpp Options.h std/memory.hpp util/csv.hpp header.hpp std/utility.hpp mergerow.hpp util/convert.hpp cell.hpp cell/cell.cpp cell/uint_cell.hpp cell/uint_cell.cpp cell/text_cell.hpp cell/text_cell.cpp column.hpp column/text_column.cpp column/column.cpp column/text_column.hpp column/uint_column.hpp column/uint_column.cpp input_row.hpp input_row/input_row.cpp)
 target_link_libraries (lmerge boost_filesystem boost_system)
 

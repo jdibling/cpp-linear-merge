@@ -30,4 +30,21 @@ static inline std::string trim(const std::string &s)
     return ltrim(rtrim(s));
 }
 
+/*** is_one_of (Val[, test1, test2, ...testN])
+ *
+ * return true if Val == one of the other passed arguments
+ * return false if Val != any of the passed arguments, or
+ *            if no arguments passed
+ */
+// base case
+template<typename Val>
+inline bool is_one_of (const Val &) {
+    return false;
+}
+
+// standard case
+template<typename Val, typename FirstArg, typename... Args>
+inline bool is_one_of (const Val &val, const FirstArg &firstArg, Args... args) {
+    return val == firstArg || is_one_of (val, args...);
+}
 #endif //QC_UTILITY_HPP
