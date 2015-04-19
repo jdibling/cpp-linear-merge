@@ -68,8 +68,8 @@ int main () {
 
   const Columns columns = GetInputFileHeader ();
 
-  InputRows leftInput;
-  InputRows rightInput;
+  InputRows leftInput (columns);
+  InputRows rightInput (columns);
 
   csv::Row csvRow;
   // read the left file

@@ -28,10 +28,6 @@ inline Str &operator<< (Str &str, const InputRow &row) {
   return str;
 }
 
-typedef std::unique_ptr<Cell> RowCell;
-typedef std::vector<RowCell> InputRow;
-typedef std::vector<InputRow> InputRows;
-
 bool Equ (const InputRow &lhs, const InputRow &rhs, const Columns &cols);
 
 Columns GetInputFileHeader ();
