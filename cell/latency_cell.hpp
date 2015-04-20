@@ -12,7 +12,7 @@ class LatencyCell
   :
     public Cell {
 public:
-  LatencyCell (const InputRow &leftInput, const InputRow &rightInput);
+  LatencyCell (const Row &leftInput, const Row &rightInput);
 
   ~LatencyCell ();
 

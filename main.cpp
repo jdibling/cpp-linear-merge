@@ -70,30 +70,21 @@ int main () {
 
   const Columns columns = GetInputFileHeader ();
 
-  InputRows leftInput (columns);
-  InputRows rightInput (columns);
-
+  RowFactory inputRowFactory (columns);
   csv::Row csvRow;
-  // read the left file
-  while ((*leftStream) >> csvRow) {
-    leftInput.emplace_back ();
-    InputRow &row = leftInput.back ();
 
-    for (size_t ix = 0; ix < csvRow.size (); ++ix) {
-      const Column &col = *columns[ix];
-      row.push_back (col.CreateCell (csvRow[ix]));
-    }
+
+  // read the left file
+  Rows leftInput;
+  while ((*leftStream) >> csvRow) {
+    leftInput.push_back (inputRowFactory.Create (csvRow));
   }
   std::clog << "Read " << leftInput.size () << " lines from left." << "\n";
 
   // read the right file
+  Rows rightInput;
   while ((*rightStream) >> csvRow) {
-    rightInput.emplace_back ();
-    InputRow &row = rightInput.back ();
-    for (size_t ix = 0; ix < csvRow.size (); ++ix) {
-      const Column &col = *columns[ix];
-      row.push_back (col.CreateCell (csvRow[ix]));
-    }
+    rightInput.push_back (inputRowFactory.Create (csvRow));
   }
   std::clog << "Read " << rightInput.size () << " lines from right." << "\n";
 
@@ -109,12 +100,12 @@ int main () {
    */
 
   // define a lambda to determine if we're at the end of both files
-  auto AtEnds = [&leftInput, &rightInput] (InputRows::const_iterator lit, InputRows::const_iterator rit) -> bool {
+  auto AtEnds = [&leftInput, &rightInput] (Rows::const_iterator lit, Rows::const_iterator rit) -> bool {
     return (lit == leftInput.end ()) && (rit == rightInput.end ());
   };
 
   // define a lambda to tell us if these iterators both point to the last elements
-  auto AtLasts = [&leftInput, &rightInput] (InputRows::const_iterator lit, InputRows::const_iterator rit) -> bool {
+  auto AtLasts = [&leftInput, &rightInput] (Rows::const_iterator lit, Rows::const_iterator rit) -> bool {
     return (lit == std::prev (leftInput.end ())) && (rit == std::prev (rightInput.end ()));
   };
 
@@ -129,11 +120,11 @@ int main () {
 
   // a structure to return from the step-search algo
   struct StepSearchResults {
-    InputRows::const_iterator mLeftIt;
-    InputRows::const_iterator mRightIt;
+    Rows::const_iterator mLeftIt;
+    Rows::const_iterator mRightIt;
     SearchSide mWhichAdvanced;
 
-    StepSearchResults (InputRows::const_iterator leftIt, InputRows::const_iterator rightIt, SearchSide side)
+    StepSearchResults (Rows::const_iterator leftIt, Rows::const_iterator rightIt, SearchSide side)
       :
       mLeftIt (leftIt),
       mRightIt (rightIt),
@@ -145,8 +136,8 @@ int main () {
   auto StepSearch = [&leftInput,
     &rightInput,
     &columns,
-    &AtLasts] (InputRows::const_iterator leftAnchorIt,
-               InputRows::const_iterator rightAnchorIt) -> StepSearchResults {
+    &AtLasts] (Rows::const_iterator leftAnchorIt,
+               Rows::const_iterator rightAnchorIt) -> StepSearchResults {
     // initial test for equality
     if (Equ (*leftAnchorIt, *rightAnchorIt, columns)) {
       // match found at beginning
@@ -154,19 +145,19 @@ int main () {
     }
 
     // the rows we're testing for equality
-    InputRows::const_iterator leftIt = leftAnchorIt;
-    InputRows::const_iterator rightIt = rightAnchorIt;
+    Rows::const_iterator leftIt = leftAnchorIt;
+    Rows::const_iterator rightIt = rightAnchorIt;
 
-    const InputRow &leftAnchor = *leftAnchorIt;
-    const InputRow &rightAnchor = *rightAnchorIt;
+    const Row &leftAnchor = *leftAnchorIt;
+    const Row &rightAnchor = *rightAnchorIt;
 
     // continue stepping until we reach the last element on both sides
-    const InputRows::const_iterator leftLastIt = std::prev (leftInput.end ());
-    const InputRows::const_iterator rightLastIt = std::prev (rightInput.end ());
+    const Rows::const_iterator leftLastIt = std::prev (leftInput.end ());
+    const Rows::const_iterator rightLastIt = std::prev (rightInput.end ());
     while (!AtLasts (leftIt, rightIt)) {
 
-      const InputRow &leftRow = *leftIt;
-      const InputRow &rightRow = *rightIt;
+      const Row &leftRow = *leftIt;
+      const Row &rightRow = *rightIt;
 
       if (Equ (leftRow, rightRow, columns)) {
         return StepSearchResults (leftIt, rightIt, SearchSide::Both);
@@ -208,15 +199,15 @@ int main () {
   };
 
   // begin step searching from beginning
-  for (InputRows::const_iterator leftRowIt = std::begin (leftInput),
+  for (Rows::const_iterator leftRowIt = std::begin (leftInput),
          rightRowIt = std::begin (rightInput);
        !AtEnds (leftRowIt, rightRowIt);
     ) {
     const bool leftEnd = leftRowIt == std::end (leftInput);
     const bool rightEnd = rightRowIt == std::end (rightInput);
 
-    const InputRow &leftRow = *leftRowIt;
-    const InputRow &rightRow = *rightRowIt;
+    const Row &leftRow = *leftRowIt;
+    const Row &rightRow = *rightRowIt;
     const std::string &leftSeq = leftRow[1].Repr ();
     const std::string &rightSeq = rightRow[1].Repr ();
 
@@ -230,8 +221,8 @@ int main () {
     if (is_one_of (stepSearchRetVal.mWhichAdvanced, SearchSide::Left, SearchSide::Both)) {
       /*** Determine & report the first and last orphans
        */
-      InputRows::const_iterator firstOrphan = leftRowIt;
-      InputRows::const_iterator lastOrphan = stepSearchRetVal.mLeftIt;
+      Rows::const_iterator firstOrphan = leftRowIt;
+      Rows::const_iterator lastOrphan = stepSearchRetVal.mLeftIt;
       // if we advanced the left side to find a match, then the found left iter
       // points to a match, not an orphan
       if (stepSearchRetVal.mWhichAdvanced == SearchSide::Left) {
@@ -240,7 +231,7 @@ int main () {
 
       // report the orphans
       for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
-        const InputRow &orphanRow = *orphan;
+        const Row &orphanRow = *orphan;
         std::cout << orphanRow[1].Repr () << " <==>" << std::endl;
       }
     }
@@ -249,8 +240,8 @@ int main () {
     if (is_one_of (stepSearchRetVal.mWhichAdvanced, SearchSide::Right, SearchSide::Both)) {
       /*** Determine & report the first and last orphans
        */
-      InputRows::const_iterator firstOrphan = rightRowIt;
-      InputRows::const_iterator lastOrphan = stepSearchRetVal.mRightIt;
+      Rows::const_iterator firstOrphan = rightRowIt;
+      Rows::const_iterator lastOrphan = stepSearchRetVal.mRightIt;
       // if we advanced the right side to find a match, then the found right iter
       // points to a match, not an orphan
       if (stepSearchRetVal.mWhichAdvanced == SearchSide::Right) {
@@ -259,7 +250,7 @@ int main () {
 
       // report the orphans
       for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
-        const InputRow &orphanRow = *orphan;
+        const Row &orphanRow = *orphan;
         std::cout << "\t\t<==>" << orphanRow[1].Repr () << std::endl;
       }
     }
@@ -267,8 +258,8 @@ int main () {
     // now report the match, if there is one
     //   if (is_one_of (stepSearchRetVal.mWhichAdvanced, SearchSide::Left, SearchSide::Right, SearchSide::Neither))
     {
-      const InputRow &leftMatch = *stepSearchRetVal.mLeftIt;
-      const InputRow &rightMatch = *stepSearchRetVal.mRightIt;
+      const Row &leftMatch = *stepSearchRetVal.mLeftIt;
+      const Row &rightMatch = *stepSearchRetVal.mRightIt;
 
       CellFactory cf (CellType::Latency);
       CellPtr latencyCell = cf.CreateMergeCell (leftMatch, rightMatch);

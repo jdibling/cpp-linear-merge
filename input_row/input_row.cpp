@@ -9,7 +9,7 @@
 #include "../column/text_column.hpp"
 #include "../column/uint_column.hpp"
 
-bool Equ (const InputRow &lhs, const InputRow &rhs, const Columns &cols) {
+bool Equ (const Row &lhs, const Row &rhs, const Columns &cols) {
 //    const auto &leftSeq = lhs[1]->Repr ();
 //    const auto &rightSeq = rhs[1]->Repr ();
 

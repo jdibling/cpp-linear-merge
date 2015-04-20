@@ -6,7 +6,7 @@
 #include "latency_cell.hpp"
 #include "uint_cell.hpp"
 
-LatencyCell::LatencyCell (const InputRow &leftInput, const InputRow &rightInput)
+LatencyCell::LatencyCell (const Row &leftInput, const Row &rightInput)
   :
   mLeftRecv (static_cast <const UIntCell &> (leftInput[0]).Native ()),
   mRightRecv (static_cast <const UIntCell &> (rightInput[0]).Native ()) {

@@ -18,7 +18,7 @@
 #define QC_HEADER_HPP
 
 template<typename Str>
-inline Str &operator<< (Str &str, const InputRow &row) {
+inline Str &operator<< (Str &str, const Row &row) {
   std::stringstream ss;
   for (auto &cell: row) {
     ss << cell << ",";
@@ -28,7 +28,7 @@ inline Str &operator<< (Str &str, const InputRow &row) {
   return str;
 }
 
-bool Equ (const InputRow &lhs, const InputRow &rhs, const Columns &cols);
+bool Equ (const Row &lhs, const Row &rhs, const Columns &cols);
 
 Columns GetInputFileHeader ();
 

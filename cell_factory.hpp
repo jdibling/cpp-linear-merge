@@ -20,7 +20,7 @@ public:
 
   }
 
-  std::unique_ptr<Cell> CreateMergeCell (const InputRow &leftRow, const InputRow &rightRow);
+  std::unique_ptr<Cell> CreateMergeCell (const Row &leftRow, const Row &rightRow);
 
 private:
   CellType mType;

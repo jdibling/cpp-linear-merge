@@ -8,11 +8,16 @@
 #include <memory>
 #include <vector>
 #include <boost/iterator/indirect_iterator.hpp>
+#include "std/memory.hpp"
+
+#include "util/csv.hpp"
+
+namespace csv = pico::util::csv;
 
 #include "cell.hpp"
 #include "column.hpp"
 
-class InputRow {
+class Row {
   typedef std::unique_ptr<Cell> CellPtr;
   typedef std::vector<CellPtr> CellPtrs;
   CellPtrs mCells;
@@ -48,41 +53,31 @@ public:
 private:
 };
 
-//typedef std::vector<RowCell> InputRow;
-
-class InputRows {
-  typedef std::vector<InputRow> Rows;
+class RowFactory {
   const Columns &mCols;
-  Rows mRows;
 public:
-  typedef Rows::iterator iterator;
-  typedef Rows::const_iterator const_iterator;
+  //typedef std::unique_ptr <InputRow> RowPtr;
 
-  InputRows (const Columns &cols)
+  RowFactory (const Columns &cols)
     :
     mCols (cols) {
   }
 
-  const Columns &GetColumns () const {
-    return mCols;
+  Row Create (const csv::Row &csvRow) const {
+    Row ret;
+
+    for (size_t idx = 0; idx < csvRow.size (); ++idx) {
+      const Column &col = *mCols[idx];
+      const std::string &cellData = csvRow[idx];
+      ret.push_back (col.CreateCell (cellData));
+    }
+
+    return ret;
   }
-
-  template<typename... Args>
-  inline void emplace_back (Args &&... args) {
-    mRows.emplace_back (args...);
-  }
-
-  const Rows::const_iterator begin () const { return mRows.begin (); }
-
-  Rows::iterator begin () { return mRows.begin (); }
-
-  const Rows::const_iterator end () const { return mRows.end (); }
-
-  Rows::iterator end () { return mRows.end (); }
-
-  const Rows::reference back () { return mRows.back (); }
-
-  Rows::size_type size () const { return mRows.size (); }
 };
+
+//typedef std::vector<RowCell> InputRow;
+
+typedef std::vector<Row> Rows;
 
 #endif //LMERGE_INPUT_ROW_HPP
