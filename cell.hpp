@@ -6,6 +6,7 @@
 #define LMERGE_CELL_HPP
 
 #include <string>
+#include <memory>
 #include "std/utility.hpp"
 
 class Cell {
@@ -18,6 +19,8 @@ public:
 
   virtual bool operator!= (const Cell &other) const; // default calls negative of op==
 };
+
+typedef std::unique_ptr<Cell> CellPtr;
 
 template<typename Str>
 inline Str &operator<< (Str &str, const Cell &cell) {

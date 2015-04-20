@@ -28,6 +28,8 @@ namespace csv = pico::util::csv;
 
 #include "header.hpp"
 
+#include "cell_factory.hpp"
+
 namespace {
   std::unique_ptr<istream> OpenFile (const fs::path &path) {
     std::unique_ptr<istream> ret = pstd::make_unique<io::filtering_istream> ();
@@ -261,10 +263,14 @@ int main () {
       const InputRow &leftMatch = *stepSearchRetVal.mLeftIt;
       const InputRow &rightMatch = *stepSearchRetVal.mRightIt;
 
+      CellFactory cf (CellType::Latency);
+      CellPtr latencyCell = cf.CreateMergeCell (leftMatch, rightMatch);
+
       std::cout
       << leftMatch[1]->Repr ()
       << "\t<==>\t"
       << rightMatch[1]->Repr ()
+         << "\t" << latencyCell->Repr ()
       << std::endl;
     }
 

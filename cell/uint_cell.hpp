@@ -15,6 +15,8 @@ public:
 
   std::string Repr () const;
 
+  uint64_t Native () const;
+
   bool operator== (const Cell &other) const;
 
   bool operator== (Cell &other);

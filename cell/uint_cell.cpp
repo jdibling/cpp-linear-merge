@@ -17,6 +17,10 @@ std::string UIntCell::Repr () const {
   return ss.str ();
 }
 
+uint64_t UIntCell::Native () const {
+  return mData;
+}
+
 bool UIntCell::operator== (const Cell &other) const {
   if (typeid (*this) != typeid (other)) {
     return false;
