@@ -3,7 +3,6 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/lmerge.iml" filepath="$PROJECT_DIR$/.idea/lmerge.iml" />
-      <module fileurl="file://$USER_HOME$/ClionProjects/lmerge/.idea/qc.iml" filepath="$USER_HOME$/ClionProjects/lmerge/.idea/qc.iml" />
     </modules>
   </component>
 </project>
