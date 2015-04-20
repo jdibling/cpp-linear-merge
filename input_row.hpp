@@ -13,7 +13,6 @@
 
 typedef std::unique_ptr<Cell> RowCell;
 typedef std::vector<RowCell> InputRow;
-//typedef std::vector<InputRow> InputRows;
 
 class InputRows {
   typedef std::vector<InputRow> Rows;
