@@ -21,7 +21,7 @@ template<typename Str>
 inline Str &operator<< (Str &str, const InputRow &row) {
   std::stringstream ss;
   for (auto &cell: row) {
-    ss << *cell << ",";
+    ss << cell << ",";
   }
 
   str << ss.str ();

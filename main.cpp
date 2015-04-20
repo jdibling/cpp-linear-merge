@@ -99,7 +99,7 @@ int main () {
 
   for (auto row = leftInput.begin (); row != leftInput.end (); ++row) {
     for (auto cell = row->begin (); cell != row->end (); ++cell) {
-      std::cout << (*cell)->Repr () << ",";
+      std::cout << cell->Repr () << ",";
     }
     std::cout << std::endl;
   }
@@ -157,17 +157,24 @@ int main () {
     InputRows::const_iterator leftIt = leftAnchorIt;
     InputRows::const_iterator rightIt = rightAnchorIt;
 
+    const InputRow &leftAnchor = *leftAnchorIt;
+    const InputRow &rightAnchor = *rightAnchorIt;
+
     // continue stepping until we reach the last element on both sides
     const InputRows::const_iterator leftLastIt = std::prev (leftInput.end ());
     const InputRows::const_iterator rightLastIt = std::prev (rightInput.end ());
     while (!AtLasts (leftIt, rightIt)) {
-      if (Equ (*leftIt, *rightIt, columns)) {
+
+      const InputRow &leftRow = *leftIt;
+      const InputRow &rightRow = *rightIt;
+
+      if (Equ (leftRow, rightRow, columns)) {
         return StepSearchResults (leftIt, rightIt, SearchSide::Both);
       }
-      const std::string &leftAnchorSeq = (*leftAnchorIt)[1]->Repr ();
-      const std::string &rightAnchorSeq = (*rightAnchorIt)[1]->Repr ();
-      const std::string &leftSeq = (*leftIt)[1]->Repr ();
-      const std::string &rightSeq = (*rightIt)[1]->Repr ();
+      const std::string &leftAnchorSeq = leftAnchor[1].Repr ();
+      const std::string &rightAnchorSeq = rightAnchor[1].Repr ();
+      const std::string &leftSeq = leftRow[1].Repr ();
+      const std::string &rightSeq = rightRow[1].Repr ();
 
       // iterators pointing to the last element on each side
 
@@ -210,8 +217,8 @@ int main () {
 
     const InputRow &leftRow = *leftRowIt;
     const InputRow &rightRow = *rightRowIt;
-    const std::string &leftSeq = leftRow[1]->Repr ();
-    const std::string &rightSeq = rightRow[1]->Repr ();
+    const std::string &leftSeq = leftRow[1].Repr ();
+    const std::string &rightSeq = rightRow[1].Repr ();
 
     if (leftSeq == "1399823") {
       bool bk = true;
@@ -234,7 +241,7 @@ int main () {
       // report the orphans
       for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
         const InputRow &orphanRow = *orphan;
-        std::cout << orphanRow[1]->Repr () << " <==>" << std::endl;
+        std::cout << orphanRow[1].Repr () << " <==>" << std::endl;
       }
     }
 
@@ -253,7 +260,7 @@ int main () {
       // report the orphans
       for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
         const InputRow &orphanRow = *orphan;
-        std::cout << "\t\t<==>" << orphanRow[1]->Repr () << std::endl;
+        std::cout << "\t\t<==>" << orphanRow[1].Repr () << std::endl;
       }
     }
 
@@ -267,9 +274,9 @@ int main () {
       CellPtr latencyCell = cf.CreateMergeCell (leftMatch, rightMatch);
 
       std::cout
-      << leftMatch[1]->Repr ()
+      << leftMatch[1].Repr ()
       << "\t<==>\t"
-      << rightMatch[1]->Repr ()
+      << rightMatch[1].Repr ()
          << "\t" << latencyCell->Repr ()
       << std::endl;
     }

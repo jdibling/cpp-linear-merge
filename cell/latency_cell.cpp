@@ -8,8 +8,8 @@
 
 LatencyCell::LatencyCell (const InputRow &leftInput, const InputRow &rightInput)
   :
-  mLeftRecv (static_cast <const UIntCell &> (*leftInput[0]).Native ()),
-  mRightRecv (static_cast <const UIntCell &> (*rightInput[0]).Native ()) {
+  mLeftRecv (static_cast <const UIntCell &> (leftInput[0]).Native ()),
+  mRightRecv (static_cast <const UIntCell &> (rightInput[0]).Native ()) {
 }
 
 LatencyCell::~LatencyCell () {

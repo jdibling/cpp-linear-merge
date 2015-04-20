@@ -5,7 +5,6 @@
 #include "../std/memory.hpp"
 
 #include "../input_row.hpp"
-#include "../column.hpp"
 
 #include "../column/text_column.hpp"
 #include "../column/uint_column.hpp"
@@ -17,8 +16,8 @@ bool Equ (const InputRow &lhs, const InputRow &rhs, const Columns &cols) {
   for (size_t idx = 0; idx < cols.size (); ++idx) {
     const Column &col = *cols[idx];
     if (col.mImportance == Column::Importance::Key) {
-      const Cell &lhc = *lhs[idx];
-      const Cell &rhc = *rhs[idx];
+      const Cell &lhc = lhs[idx];
+      const Cell &rhc = rhs[idx];
 
       if (lhc != rhc) {
         return false;

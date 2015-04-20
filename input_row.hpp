@@ -7,12 +7,48 @@
 
 #include <memory>
 #include <vector>
+#include <boost/iterator/indirect_iterator.hpp>
 
 #include "cell.hpp"
 #include "column.hpp"
 
-typedef std::unique_ptr<Cell> RowCell;
-typedef std::vector<RowCell> InputRow;
+class InputRow {
+  typedef std::unique_ptr<Cell> CellPtr;
+  typedef std::vector<CellPtr> CellPtrs;
+  CellPtrs mCells;
+
+public:
+  using iterator = boost::indirect_iterator<decltype (mCells)::iterator>;
+  using const_iterator = boost::indirect_iterator<decltype (mCells)::const_iterator>;
+
+  iterator begin () {
+    return mCells.begin ();
+  }
+
+  const_iterator begin () const {
+    return mCells.begin ();
+  }
+
+  iterator end () {
+    return mCells.end ();
+  }
+
+  const_iterator end () const {
+    return mCells.end ();
+  }
+
+  inline const Cell &operator[] (size_t idx) const {
+    return *(mCells[idx]);
+  }
+
+  inline void push_back (CellPtr &&cell) {
+    mCells.push_back (std::move (cell));
+  }
+
+private:
+};
+
+//typedef std::vector<RowCell> InputRow;
 
 class InputRows {
   typedef std::vector<InputRow> Rows;
