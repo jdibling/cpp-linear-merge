@@ -12,9 +12,9 @@
 
 class UIntColumn
   :
-    public Column {
+    public InputColumn {
 public:
-  using Column::Column;
+  using InputColumn::InputColumn;
 
   ~UIntColumn ();
 

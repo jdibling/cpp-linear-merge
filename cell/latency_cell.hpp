@@ -5,8 +5,8 @@
 #ifndef LMERGE_LATENCYCELL_H
 #define LMERGE_LATENCYCELL_H
 
-
-#include "../input_row.hpp"
+#include "../cell.hpp"
+#include "../row.hpp"
 
 class LatencyCell
   :

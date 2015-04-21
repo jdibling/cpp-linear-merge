@@ -28,8 +28,6 @@ namespace csv = pico::util::csv;
 
 #include "header.hpp"
 
-#include "cell_factory.hpp"
-
 namespace {
   std::unique_ptr<istream> OpenFile (const fs::path &path) {
     std::unique_ptr<istream> ret = pstd::make_unique<io::filtering_istream> ();
@@ -68,7 +66,7 @@ int main () {
   }
   std::cout << "Opened Right file '" << leftPath << "': " << fs::file_size (rightPath) << " bytes." << std::endl;
 
-  const Columns columns = GetInputFileHeader ();
+  const InputColumns columns = GetInputFileHeader ();
 
   RowFactory inputRowFactory (columns);
   csv::Row csvRow;
@@ -261,8 +259,8 @@ int main () {
       const Row &leftMatch = *stepSearchRetVal.mLeftIt;
       const Row &rightMatch = *stepSearchRetVal.mRightIt;
 
-      CellFactory cf (CellType::Latency);
-      CellPtr latencyCell = cf.CreateMergeCell (leftMatch, rightMatch);
+      MergeCellFactory cf (MergeCellType::Latency);
+      CellPtr latencyCell = cf.Create (leftMatch, rightMatch);
 
       std::cout
       << leftMatch[1].Repr ()

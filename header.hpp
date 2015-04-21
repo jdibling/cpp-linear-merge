@@ -12,7 +12,7 @@
 
 #include "cell.hpp"
 #include "column.hpp"
-#include "input_row.hpp"
+#include "row.hpp"
 
 #ifndef QC_HEADER_HPP
 #define QC_HEADER_HPP
@@ -28,8 +28,8 @@ inline Str &operator<< (Str &str, const Row &row) {
   return str;
 }
 
-bool Equ (const Row &lhs, const Row &rhs, const Columns &cols);
+bool Equ (const Row &lhs, const Row &rhs, const InputColumns &cols);
 
-Columns GetInputFileHeader ();
+InputColumns GetInputFileHeader ();
 
 #endif //QC_HEADER_HPP

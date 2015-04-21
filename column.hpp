@@ -9,25 +9,30 @@
 #include <memory>
 
 #include "cell.hpp"
+#include "cell_factory.hpp"
 
-class Column {
+class InputColumn {
 public:
   enum class Importance {
     Unimportant,
     Key
   };
 
-  Column (const std::string &name, Importance importance = Importance::Unimportant);
+  InputColumn (InputCellFactory::Type type,
+               const std::string &colName,
+               Importance importance = Importance::Unimportant)
+    :
+    mFactory (type),
+    mName (colame),
+    mImportance (importance) {
+  }
 
-  virtual std::unique_ptr<Cell> CreateCell (const std::string &data) const = 0;
-
-  virtual ~Column () = 0;
-
+  const InputCellFactory mFactory;
   const std::string mName;
   const Importance mImportance;
 };
 
-typedef std::vector<std::unique_ptr<Column>> Columns;
+typedef std::vector<std::unique_ptr<InputColumn>> InputColumns;
 
 
 #endif //LMERGE_COLUMN_HPP

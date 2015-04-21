@@ -6,24 +6,42 @@
 #define LMERGE_CELLFACTORY_H
 
 
-#include "input_row.hpp"
+#include "row.hpp"
 
-enum class CellType {
+class InputCellFactory {
+public:
+  enum class Type {
+    Text,
+    UInt
+  };
+
+  InputCellFactory (Type type)
+    :
+    mType (type) {
+  }
+
+  std::unique_ptr<Cell> Create (const std::string &cellData) const;
+
+private:
+  Type mType;
+};
+
+enum class MergeCellType {
   Latency
 };
 
-class CellFactory {
+class MergeCellFactory {
 public:
-  CellFactory (CellType type)
+  MergeCellFactory (MergeCellType type)
     :
     mType (type) {
 
   }
 
-  std::unique_ptr<Cell> CreateMergeCell (const Row &leftRow, const Row &rightRow);
+  std::unique_ptr<Cell> Create (const Row &leftRow, const Row &rightRow);
 
 private:
-  CellType mType;
+  MergeCellType mType;
 };
 
 

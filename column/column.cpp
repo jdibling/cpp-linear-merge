@@ -3,13 +3,13 @@
 //
 #include "../column.hpp"
 
-Column::Column (const std::string &name, Importance importance)
+InputColumn::InputColumn (const std::string &name, Importance importance)
   :
   mName (name),
   mImportance (importance) {
 }
 
-Column::~Column () {
+InputColumn::~InputColumn () {
 
 }
 

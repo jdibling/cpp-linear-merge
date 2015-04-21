@@ -54,11 +54,11 @@ private:
 };
 
 class RowFactory {
-  const Columns &mCols;
+  const InputColumns &mCols;
 public:
   //typedef std::unique_ptr <InputRow> RowPtr;
 
-  RowFactory (const Columns &cols)
+  RowFactory (const InputColumns &cols)
     :
     mCols (cols) {
   }
@@ -67,7 +67,7 @@ public:
     Row ret;
 
     for (size_t idx = 0; idx < csvRow.size (); ++idx) {
-      const Column &col = *mCols[idx];
+      const InputColumn &col = *mCols[idx];
       const std::string &cellData = csvRow[idx];
       ret.push_back (col.CreateCell (cellData));
     }
