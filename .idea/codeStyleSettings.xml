@@ -11,6 +11,7 @@
           <option name="CLASS_CONSTRUCTOR_INIT_LIST_NEW_LINE_BEFORE_COLON" value="1" />
           <option name="CLASS_CONSTRUCTOR_INIT_LIST_NEW_LINE_AFTER_COLON" value="1" />
           <option name="SPACE_BEFORE_INIT_LIST_COLON" value="false" />
+          <option name="SPACE_AFTER_INIT_LIST_COLON" value="false" />
           <option name="SPACE_BEFORE_INIT_LIST" value="true" />
         </Objective-C>
         <Objective-C-extensions>
