@@ -8,11 +8,14 @@
 #include <vector>
 #include <iterator>
 
+#include "../std/utility.hpp"
+
 #include <boost/algorithm/string/join.hpp>
 #include <boost/iterator/indirect_iterator.hpp>
 #include <boost/utility/result_of.hpp>
 
 #include "../cell/Cell.hpp"
+#include "../column/Column.hpp"
 
 //typedef std::vector <CellPtr> Row;
 
@@ -58,24 +61,6 @@ inline bool Equ (const Row &lhs, const Row &rhs, const Columns &columns) {
 }
 
 typedef std::vector<Row> Rows;
-
-template<typename Cont>
-inline std::string join (const Cont &cont, const std::string &delim) {
-  typename Cont::const_iterator begin = std::begin (cont);
-  typename Cont::const_iterator end = std::end (cont);
-
-  std::string result;
-
-  while (begin != end) {
-    result.append (*begin++);
-    if (begin != end) {
-      result.append (delim);
-    }
-  }
-
-  return result;
-
-}
 
 template<typename Str>
 Str &operator<< (Str &str, const Row &row) {

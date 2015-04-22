@@ -14,25 +14,16 @@
 
 class Cell {
 public:
-  Cell (const std::string data)
-    :
-    mOrigData (data) {
-  }
-
   virtual ~Cell () = 0;
 
   virtual std::string Repr () const = 0;
   operator std::string () const { return Repr (); }
-  std::string Orig () const { return mOrigData; }
 
   virtual bool operator== (const Cell &rhc) const = 0;
 
   virtual bool operator!= (const Cell &rhc) const {
     return !operator== (rhc);
   }
-
-protected:
-  const std::string mOrigData;
 };
 
 typedef std::shared_ptr<Cell> CellPtr;

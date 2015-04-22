@@ -26,7 +26,6 @@ typedef io::filtering_istream istream;
 #include "column/Column.hpp"
 #include "row/Row.hpp"
 #include "StepSearch.hpp"
-#include "std/utility.hpp"
 
 namespace csv = pico::util::csv;
 
@@ -106,10 +105,10 @@ int main () {
     leftInput.push_back (std::move (inputRow));
   }
   std::clog << "Read " << leftInput.size () << " lines from left." << "\n";
-  for (size_t idx = 0; idx < leftInput.size (); ++idx) {
-    const Row &row = leftInput[idx];
-    std::clog << "[" << idx + 1 << "]:\t" << row << std::endl;
-  }
+//  for (size_t idx = 0; idx < leftInput.size (); ++idx) {
+//    const Row &row = leftInput[idx];
+//    std::clog << "[" << idx + 1 << "]:\t" << row << std::endl;
+//  }
   
   // read the right file & create an input row
   Rows rightInput;
@@ -125,10 +124,10 @@ int main () {
     rightInput.push_back (std::move (inputRow));
   }
   std::clog << "Read " << rightInput.size () << " lines from right." << "\n";
-  for (size_t idx = 0; idx < rightInput.size (); ++idx) {
-    const Row &row = rightInput[idx];
-    std::clog << "[" << idx + 1 << "]:\t" << row << std::endl;
-  }
+//  for (size_t idx = 0; idx < rightInput.size (); ++idx) {
+//    const Row &row = rightInput[idx];
+//    std::clog << "[" << idx + 1 << "]:\t" << row << std::endl;
+//  }
 
   // begin step searching from beginning
   const Rows::const_iterator leftEnd = std::end (leftInput);
@@ -162,7 +161,7 @@ int main () {
       // report the orphans
       for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
         const Row &orphanRow = *orphan;
-        std::clog << orphanRow[1].Repr () << " <==>" << std::endl;
+//        std::clog << orphanRow[1].Repr () << " <==>" << std::endl;
       }
     }
 
@@ -181,7 +180,7 @@ int main () {
       // report the orphans
       for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
         const Row &orphanRow = *orphan;
-        std::clog << "\t\t<==>\t" << orphanRow[1].Repr () << std::endl;
+//        std::clog << "\t\t<==>\t" << orphanRow[1].Repr () << std::endl;
       }
     }
 
@@ -191,6 +190,9 @@ int main () {
       const Row &leftMatch = *stepSearchRetVal.mLeftIt;
       const Row &rightMatch = *stepSearchRetVal.mRightIt;
 
+      CellFactory cf (CellFactory::Type::Diff);
+      CellPtr diffCell = cf.CreateMergeCell (rightMatch[0], leftMatch[0]);
+
 //      CellFactory cf (CellType::Latency);
 //      CellPtr latencyCell = cf.CreateMergeCell (leftMatch, rightMatch);
 
@@ -198,7 +200,7 @@ int main () {
       << leftMatch[1].Repr ()
       << "\t<==>\t"
       << rightMatch[1].Repr ()
-//         << "\t" << latencyCell->Repr ()
+         << "\t" << diffCell->Repr ()
       << std::endl;
     }
 

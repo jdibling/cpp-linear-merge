@@ -5,21 +5,24 @@
 #ifndef LMERGE_UINTCELL_HPP
 #define LMERGE_UINTCELL_HPP
 
-#include "Cell.hpp"
+#include "../Cell.hpp"
+#include "InputCell.hpp"
 
 class UIntCell
   :
-    public Cell {
+    public InputCell {
 public:
   explicit UIntCell (const std::string &origData)
     :
-    Cell (origData),
+    InputCell (origData),
     mData (Convert<uint64_t> (origData)) {
   }
 
   std::string Repr () const {
     return Convert<std::string> (mData);
   }
+
+  uint64_t Val () const { return mData; }
 
   inline bool operator== (const Cell &rhc) const {
     if (typeid (*this) != typeid (rhc)) {

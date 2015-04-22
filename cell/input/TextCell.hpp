@@ -5,25 +5,29 @@
 #ifndef LMERGE_TEXTCELL_HPP
 #define LMERGE_TEXTCELL_HPP
 
+#include "../Cell.hpp"
+#include "InputCell.hpp"
+
 class TextCell
   :
-    public Cell {
+    public InputCell {
 public:
-  using Cell::Cell;
+  using InputCell::InputCell;
 
   std::string Repr () const {
     return mOrigData;
   }
 
+  const std::string &Val () const { return mOrigData; }
+
   bool operator== (const Cell &rhc) const {
     if (typeid (*this) != typeid (rhc)) {
       return false;
     }
-    const TextCell &other = static_cast <TextCell> (rhc);
-    return mOrigData == rhc.Orig ();
+    const TextCell &other = static_cast <const TextCell &> (rhc);
+    return mOrigData == other.Orig ();
   }
 };
 
-#include "Cell.hpp"
 
 #endif //LMERGE_TEXTCELL_HPP

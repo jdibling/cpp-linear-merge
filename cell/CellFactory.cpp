@@ -5,18 +5,24 @@
 #include "CellFactory.hpp"
 #include "../std/memory.hpp"
 
-#include "TextCell.hpp"
-#include "UIntCell.hpp"
+#include "input/TextCell.hpp"
+#include "input/UIntCell.hpp"
+#include "merge/DiffCell.h"
 
-template<typename CellType>
-CellPtr MakeCell (const std::string &data) {
-  return pstd::make_unique<CellType> (data);
+template<typename CellType, typename ...Args>
+CellPtr MakeCell (const Args &... args) {
+  return pstd::make_unique<CellType> (args...);
 }
 
-CellPtr CellFactory::Create (const std::string &data) const {
+CellPtr CellFactory::CreateInputCell (const std::string &data) const {
   switch (mType) {
     case Type::Text: return MakeCell<TextCell> (data);
     case Type::UInt: return MakeCell<UIntCell> (data);
+  }
+}
 
+CellPtr CellFactory::CreateMergeCell (const Cell &left, const Cell &right) const {
+  switch (mType) {
+    case Type::Diff: return MakeCell<DiffCell> (left, right);
   }
 }

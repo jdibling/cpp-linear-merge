@@ -13,7 +13,10 @@ public:
   enum class Type {
     // Simple (input) cells
       UInt,
-    Text
+    Text,
+
+    // Computed (merge) cells
+      Diff,
   };
 
   CellFactory (Type type)
@@ -21,7 +24,9 @@ public:
     mType (type) {
   }
 
-  CellPtr Create (const std::string &data) const;
+  CellPtr CreateInputCell (const std::string &data) const;
+
+  CellPtr CreateMergeCell (const Cell &left, const Cell &right) const;
 
 private:
   const Type mType;

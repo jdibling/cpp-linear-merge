@@ -47,4 +47,23 @@ template<typename Val, typename FirstArg, typename... Args>
 inline bool is_one_of (const Val &val, const FirstArg &firstArg, Args... args) {
     return val == firstArg || is_one_of (val, args...);
 }
+
+template<typename Cont>
+inline std::string join (const Cont &cont, const std::string &delim) {
+    typename Cont::const_iterator begin = std::begin (cont);
+    typename Cont::const_iterator end = std::end (cont);
+
+    std::string result;
+
+    while (begin != end) {
+        result.append (*begin++);
+        if (begin != end) {
+            result.append (delim);
+        }
+    }
+
+    return result;
+
+}
+
 #endif //QC_UTILITY_HPP

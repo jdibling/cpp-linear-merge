@@ -15,5 +15,5 @@ Column::~Column () {
 }
 
 CellPtr Column::CreateInputCell (const std::string &data) const {
-  return mCellFactory.Create (data);
+  return mCellFactory.CreateInputCell (data);
 }
