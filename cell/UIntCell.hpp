@@ -21,6 +21,14 @@ public:
     return Convert<std::string> (mData);
   }
 
+  inline bool operator== (const Cell &rhc) const {
+    if (typeid (*this) != typeid (rhc)) {
+      return false;
+    }
+    const UIntCell &other = static_cast <const UIntCell &> (rhc);
+    return mData == other.mData;
+  }
+
 private:
   unsigned long mData;
 };

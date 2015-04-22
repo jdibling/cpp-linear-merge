@@ -14,6 +14,14 @@ public:
   std::string Repr () const {
     return mOrigData;
   }
+
+  bool operator== (const Cell &rhc) const {
+    if (typeid (*this) != typeid (rhc)) {
+      return false;
+    }
+    const TextCell &other = static_cast <TextCell> (rhc);
+    return mOrigData == rhc.Orig ();
+  }
 };
 
 #include "Cell.hpp"

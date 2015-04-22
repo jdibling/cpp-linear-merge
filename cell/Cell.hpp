@@ -8,6 +8,7 @@
 
 #include <string>
 #include <memory>
+#include <iostream>
 
 #include "../util/convert.hpp"
 
@@ -21,10 +22,14 @@ public:
   virtual ~Cell () = 0;
 
   virtual std::string Repr () const = 0;
-
   operator std::string () const { return Repr (); }
-
   std::string Orig () const { return mOrigData; }
+
+  virtual bool operator== (const Cell &rhc) const = 0;
+
+  virtual bool operator!= (const Cell &rhc) const {
+    return !operator== (rhc);
+  }
 
 protected:
   const std::string mOrigData;

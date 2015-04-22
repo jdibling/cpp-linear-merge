@@ -5,6 +5,7 @@
 #ifndef LMERGE_COLUMN_H
 #define LMERGE_COLUMN_H
 
+#include <vector>
 
 #include "../cell/CellFactory.hpp"
 
@@ -21,12 +22,13 @@ public:
 
   CellPtr CreateInputCell (const std::string &data) const;
 
-private:
   const std::string mName;
   const Importance mImportance;
   const CellFactory mCellFactory;
 };
 
 typedef Column::Importance Importance;
+
+typedef std::vector<Column> Columns;
 
 #endif //LMERGE_COLUMN_H

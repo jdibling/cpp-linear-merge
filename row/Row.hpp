@@ -21,19 +21,43 @@ class Row {
 public:
   typedef boost::indirect_iterator<decltype (mCells)::iterator> iterator;
   typedef boost::indirect_iterator<decltype (mCells)::const_iterator> const_iterator;
+  typedef Cell &reference;
+  typedef const Cell &const_reference;
 
+  decltype (mCells)::size_type
+
+  size () const { return mCells.size (); }
   iterator begin () { return mCells.begin (); }
-
   const_iterator begin () const { return mCells.begin (); }
-
   iterator end () { return mCells.end (); }
-
   const_iterator end () const { return mCells.end (); }
+
+  const_reference front () const { return *begin (); }
+
+  const Cell &operator[] (size_t idx) const { return *mCells[idx]; }
 
   template<typename Val>
   void push_back (const Val &val) { mCells.push_back (val); }
-
 };
+
+inline bool Equ (const Row &lhs, const Row &rhs, const Columns &columns) {
+  // assumption: lhs, rhs and columns all have the same number of elements
+  for (size_t idx = 0; idx != lhs.size (); ++idx) {
+    const Cell &lhc = lhs[idx];
+    const Cell &rhc = rhs[idx];
+    const Column &col = columns[idx];
+
+    if (col.mImportance == Column::Importance::Key) {
+      if (lhc != rhc) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+typedef std::vector<Row> Rows;
 
 template<typename Cont>
 inline std::string join (const Cont &cont, const std::string &delim) {
@@ -58,5 +82,6 @@ Str &operator<< (Str &str, const Row &row) {
   str << join (row, ",");
   return str;
 }
+
 
 #endif //LMERGE_ROW_H
