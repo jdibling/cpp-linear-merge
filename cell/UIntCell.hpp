@@ -11,14 +11,14 @@ class UIntCell
   :
     public Cell {
 public:
-  UIntCell (const std::string &origData)
+  explicit UIntCell (const std::string &origData)
     :
     Cell (origData),
-    mData (Convert<unsigned long> (origData)) {
+    mData (Convert<uint64_t> (origData)) {
   }
 
   std::string Repr () const {
-    return Convert<std::string, unsigned long> (mData);
+    return Convert<std::string> (mData);
   }
 
 private:

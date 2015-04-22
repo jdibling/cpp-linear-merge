@@ -14,6 +14,6 @@ Column::Column (const std::string &name, CellFactory::Type type, Importance impo
 Column::~Column () {
 }
 
-CellPtr Column::CreateInputCell (const std::string &data) {
+CellPtr Column::CreateInputCell (const std::string &data) const {
   return mCellFactory.Create (data);
 }

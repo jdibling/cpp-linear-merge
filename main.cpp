@@ -24,6 +24,7 @@ typedef io::filtering_istream istream;
 
 #include "util/csv.hpp"
 #include "column/Column.hpp"
+#include "row/Row.hpp"
 
 namespace csv = pico::util::csv;
 
@@ -66,7 +67,8 @@ int main () {
   std::cout << "Opened Right file '" << leftPath << "': " << fs::file_size (rightPath) << " bytes." << std::endl;
 
   // Get ready to read the inputs
-  std::vector<Column> inputColumns {
+  typedef std::vector<Column> Columns;
+  Columns inputColumns {
     Column ("RecvTime", CellType::UInt),
     Column ("SeqNum", CellType::UInt),
     Column ("Ticker", CellType::Text),
@@ -85,30 +87,43 @@ int main () {
   };
 
   csv::Row csvRow;
-  // read the left file
-
+  // read the left file & create an input row
+  std::vector<Row> leftInput;
   while ((*leftStream) >> csvRow) {
-//    leftInput.emplace_back ();
-//    InputRow &row = leftInput.back ();
+    Row inputRow;
 
-//    for (size_t ix = 0; ix < csvRow.size (); ++ix) {
-//      const Column &col = *columns[ix];
-//      row.push_back (col.CreateCell (csvRow[ix]));
-//    }
+    for (size_t idx = 0; idx < csvRow.size (); ++idx) {
+      const std::string &cellData = csvRow[idx];
+      const Column &col = inputColumns[idx];
+      inputRow.push_back (col.CreateInputCell (cellData));
+    }
+
+    leftInput.push_back (std::move (inputRow));
   }
-//  std::clog << "Read " << leftInput.size () << " lines from left." << "\n";
-
-  // read the right file
+  std::clog << "Read " << leftInput.size () << " lines from left." << "\n";
+  for (size_t idx = 0; idx < leftInput.size (); ++idx) {
+    const Row &row = leftInput[idx];
+    std::clog << "[" << idx + 1 << "]:\t" << row << std::endl;
+  }
+  
+  // read the right file & create an input row
+  std::vector<Row> rightInput;
   while ((*rightStream) >> csvRow) {
-//    rightInput.emplace_back ();
-//    InputRow &row = rightInput.back ();
-//    for (size_t ix = 0; ix < csvRow.size (); ++ix) {
-//      const Column &col = *columns[ix];
-//      row.push_back (col.CreateCell (csvRow[ix]));
-//    }
-  }
-//  std::clog << "Read " << rightInput.size () << " lines from right." << "\n";
+    Row inputRow;
 
+    for (size_t idx = 0; idx < csvRow.size (); ++idx) {
+      const std::string &cellData = csvRow[idx];
+      const Column &col = inputColumns[idx];
+      inputRow.push_back (col.CreateInputCell (cellData));
+    }
+
+    rightInput.push_back (std::move (inputRow));
+  }
+  std::clog << "Read " << rightInput.size () << " lines from right." << "\n";
+  for (size_t idx = 0; idx < rightInput.size (); ++idx) {
+    const Row &row = rightInput[idx];
+    std::clog << "[" << idx + 1 << "]:\t" << row << std::endl;
+  }
 
   // define a lambda to determine if we're at the end of both files
 //  auto AtEnds = [&leftInput, &rightInput] (InputRows::const_iterator lit, InputRows::const_iterator rit) -> bool {

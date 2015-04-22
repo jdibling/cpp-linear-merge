@@ -19,7 +19,7 @@ public:
           Importance importance = Importance::Unimportant);  // constructor for input input cell column
   ~Column ();
 
-  CellPtr CreateInputCell (const std::string &data);
+  CellPtr CreateInputCell (const std::string &data) const;
 
 private:
   const std::string mName;

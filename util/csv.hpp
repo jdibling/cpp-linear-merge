@@ -9,7 +9,14 @@ namespace util {
 namespace csv {
 
     class Row {
+        typedef std::vector<std::string> Cont;
+        Cont mData;
     public:
+        typedef Cont::iterator iterator;
+        typedef Cont::const_iterator const_iterator;
+
+        typedef Cont::reference reference;
+
         const std::string operator[](size_t index) const {
             return mData[index];
         }
@@ -17,6 +24,14 @@ namespace csv {
         size_t size() const {
             return mData.size();
         }
+
+        Cont::iterator begin () { return mData.begin (); }
+
+        Cont::const_iterator begin () const { return mData.begin (); }
+
+        Cont::iterator end () { return mData.end (); }
+
+        Cont::const_iterator end () const { return mData.end (); }
 
         template<typename Str>
         void ReadLine(Str &str) {
@@ -31,8 +46,6 @@ namespace csv {
             }
         }
 
-    private:
-        std::vector <std::string> mData;
     };
 
 }

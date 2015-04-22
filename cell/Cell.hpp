@@ -22,13 +22,16 @@ public:
 
   virtual std::string Repr () const = 0;
 
+  operator std::string () const { return Repr (); }
+
   std::string Orig () const { return mOrigData; }
 
 protected:
   const std::string mOrigData;
 };
 
-typedef std::unique_ptr<Cell> CellPtr;
+typedef std::shared_ptr<Cell> CellPtr;
+
 
 
 #endif //LMERGE_CELL_H
