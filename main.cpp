@@ -26,8 +26,6 @@ typedef io::filtering_istream istream;
 
 namespace csv = pico::util::csv;
 
-#include "header.hpp"
-
 namespace {
   std::unique_ptr<istream> OpenFile (const fs::path &path) {
     std::unique_ptr<istream> ret = pstd::make_unique<io::filtering_istream> ();
@@ -66,7 +64,7 @@ int main () {
   }
   std::cout << "Opened Right file '" << leftPath << "': " << fs::file_size (rightPath) << " bytes." << std::endl;
 
-  const Columns columns = GetInputFileHeader ();
+//  const Columns columns = GetInputFileHeader ();
 
 //  InputRows leftInput (columns);
 //  InputRows rightInput (columns);
@@ -116,18 +114,18 @@ int main () {
   };
 
   // a structure to return from the step-search algo
-  struct StepSearchResults {
-    InputRows::const_iterator mLeftIt;
-    InputRows::const_iterator mRightIt;
-    SearchSide mWhichAdvanced;
-
-    StepSearchResults (InputRows::const_iterator leftIt, InputRows::const_iterator rightIt, SearchSide side)
-      :
-      mLeftIt (leftIt),
-      mRightIt (rightIt),
-      mWhichAdvanced (side) {
-    }
-  };
+//  struct StepSearchResults {
+////    InputRows::const_iterator mLeftIt;
+////    InputRows::const_iterator mRightIt;
+//    SearchSide mWhichAdvanced;
+//
+//    StepSearchResults (InputRows::const_iterator leftIt, InputRows::const_iterator rightIt, SearchSide side)
+//      :
+//      mLeftIt (leftIt),
+//      mRightIt (rightIt),
+//      mWhichAdvanced (side) {
+//    }
+//  };
 
   // define a lambda to perform the step-search for a match
 //  auto StepSearch = [&leftInput,
