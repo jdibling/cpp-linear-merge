@@ -23,6 +23,7 @@ namespace b = boost;
 typedef io::filtering_istream istream;
 
 #include "util/csv.hpp"
+#include "column/Column.hpp"
 
 namespace csv = pico::util::csv;
 
@@ -64,13 +65,28 @@ int main () {
   }
   std::cout << "Opened Right file '" << leftPath << "': " << fs::file_size (rightPath) << " bytes." << std::endl;
 
-//  const Columns columns = GetInputFileHeader ();
-
-//  InputRows leftInput (columns);
-//  InputRows rightInput (columns);
+  // Get ready to read the inputs
+  std::vector<Column> inputColumns {
+    Column ("RecvTime", CellType::UInt),
+    Column ("SeqNum", CellType::UInt),
+    Column ("Ticker", CellType::Text),
+    Column ("BidSide", CellType::Text),
+    Column ("BidPrice", CellType::Text, Importance::Key),
+    Column ("BidSizeRaw", CellType::UInt),
+    Column ("BidSize", CellType::UInt, Importance::Key),
+    Column ("BidTime", CellType::Text),
+    Column ("BidVenue", CellType::Text),
+    Column ("AskSide", CellType::Text),
+    Column ("AskPrice", CellType::Text, Importance::Key),
+    Column ("AskSizeRaw", CellType::UInt),
+    Column ("AskSize", CellType::UInt, Importance::Key),
+    Column ("AskTime", CellType::Text),
+    Column ("AskVenue", CellType::Text)
+  };
 
   csv::Row csvRow;
   // read the left file
+
   while ((*leftStream) >> csvRow) {
 //    leftInput.emplace_back ();
 //    InputRow &row = leftInput.back ();

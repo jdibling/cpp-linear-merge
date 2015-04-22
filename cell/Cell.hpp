@@ -7,6 +7,8 @@
 
 
 #include <string>
+#include <memory>
+
 #include "../util/convert.hpp"
 
 class Cell {
@@ -26,34 +28,7 @@ protected:
   const std::string mOrigData;
 };
 
-class TextCell
-  :
-    public Cell {
-public:
-  using Cell::Cell;
-
-  std::string Repr () const {
-    return mOrigData;
-  }
-};
-
-class UIntCell
-  :
-    public Cell {
-public:
-  UIntCell (const std::string &origData)
-    :
-    Cell (origData),
-    mData (Convert<uint64_t> (origData)) {
-  }
-
-  std::string Repr () const {
-    return Convert<std::string, uint64_t> (mData);
-  }
-
-private:
-  uint64_t mData;
-};
+typedef std::unique_ptr<Cell> CellPtr;
 
 
 #endif //LMERGE_CELL_H
