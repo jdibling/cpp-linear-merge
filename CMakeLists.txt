@@ -10,6 +10,6 @@ include_directories (${Boost_INCLUDE_DIRS})
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
-add_executable(lmerge main.cpp std/memory.hpp util/csv.hpp header.hpp std/utility.hpp util/convert.hpp )
+add_executable(lmerge main.cpp std/memory.hpp util/csv.hpp std/utility.hpp util/convert.hpp )
 target_link_libraries (lmerge boost_filesystem boost_system)
 
