@@ -25,7 +25,7 @@ public:
 
   }
 
-  OutputRow &&CreateOutputRow (boost::optional<InputRow> leftInput,
+  OutputRowPtr CreateOutputRow (boost::optional<InputRow> leftInput,
                                boost::optional<InputRow> rightInput);
 };
 

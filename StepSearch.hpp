@@ -37,9 +37,14 @@ StepSearchResults StepSearch (const Rows::const_iterator leftBegin,
                               const Rows::const_iterator leftEnd,
                               const Rows::const_iterator rightBegin,
                               const Rows::const_iterator rightEnd,
-                              const Columns &columns) {
-  const std::string &leftAnchorSeq = leftBegin->front ().Repr ();
-  const std::string &rightAnchorSeq = rightBegin->front ().Repr ();
+                              const Columns &columns,
+                              bool isFirstSync) {
+  const std::string &leftAnchorSeq = (*leftBegin)[1].Repr ();
+  const std::string &rightAnchorSeq = (*rightBegin)[1].Repr ();
+
+  if (leftAnchorSeq == "1399823") {
+    bool bk = true;
+  }
 
   // initial test for equality
   if (Equ (*leftBegin, *rightBegin, columns)) {
@@ -61,8 +66,16 @@ StepSearchResults StepSearch (const Rows::const_iterator leftBegin,
     const InputRow &leftRow = *leftIt;
     const InputRow &rightRow = *rightIt;
 
-    if (Equ (leftRow, rightRow, columns)) {
-      return StepSearchResults (leftIt, rightIt, SearchSide::Both);
+    std::string leftSeq = leftRow[1].Repr ();
+    std::string rightSeq = rightRow[1].Repr ();
+
+    // if we aren't looking for the *first* sync point,
+    // check to see if we found a match by advancing both
+    // iterators
+    if (!isFirstSync) {
+      if (Equ (leftRow, rightRow, columns)) {
+        return StepSearchResults (leftIt, rightIt, SearchSide::Both);
+      }
     }
 
     // iterators pointing to the last element on each side
@@ -74,6 +87,7 @@ StepSearchResults StepSearch (const Rows::const_iterator leftBegin,
     // advance the left and test against the right anchor
     if (!leftAnchorIsLast && !leftItIsLast) {
       leftIt = std::next (leftIt);
+      leftSeq = (*leftIt)[1].Repr ();
       if (Equ (*leftIt, rightAnchor, columns)) {
         // we found a match by advanccing the left side
         return StepSearchResults (leftIt, rightBegin, SearchSide::Left);
@@ -83,6 +97,7 @@ StepSearchResults StepSearch (const Rows::const_iterator leftBegin,
     // now advance the right and test against the left anchor
     if (!rightAnchorIsLast && !rightItIsLast) {
       rightIt = std::next (rightIt);
+      rightSeq = (*rightIt)[1].Repr ();
       if (Equ (leftAnchor, *rightIt, columns)) {
         // we found a match by advancing the right side
         return StepSearchResults (leftBegin, rightIt, SearchSide::Right);

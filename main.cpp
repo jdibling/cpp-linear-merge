@@ -137,10 +137,14 @@ int main () {
   // begin step searching from beginning
   const Rows::const_iterator leftEnd = std::end (leftInput);
   const Rows::const_iterator rightEnd = std::end (rightInput);
+  OutputRowFactory outRowFactory (inputColumns, outputColumns);
+
+  bool firstSearch = true;
 
   for (Rows::const_iterator leftRowIt = std::begin (leftInput),
          rightRowIt = std::begin (rightInput);
        !(leftRowIt == leftEnd && rightRowIt == rightEnd);
+       firstSearch = false
     ) {
     const bool atLeftEnd = (leftRowIt == leftEnd);
     const bool atRightEnd = (rightRowIt == rightEnd);
@@ -149,7 +153,8 @@ int main () {
     const std::string &leftSeq = leftRow[1].Repr ();
     const std::string &rightSeq = rightRow[1].Repr ();
 
-    StepSearchResults stepSearchRetVal = StepSearch (leftRowIt, leftEnd, rightRowIt, rightEnd, inputColumns);
+    StepSearchResults stepSearchRetVal = StepSearch (leftRowIt, leftEnd, rightRowIt, rightEnd, inputColumns,
+                                                     firstSearch);
 
     // report left orphans, if any
     if (is_one_of (stepSearchRetVal.mWhichAdvanced, SearchSide::Left, SearchSide::Both)) {
@@ -166,7 +171,12 @@ int main () {
       // report the orphans
       for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
         const InputRow &orphanRow = *orphan;
-//        std::clog << orphanRow[1].Repr () << " <==>" << std::endl;
+        OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (orphanRow, boost::none);
+        OutputRow &outRow = *outRowPtr;
+
+        std::cout << outRow << std::endl;
+
+        //std::clog << orphanRow[1].Repr () << " <==>" << std::endl;
       }
     }
 
@@ -185,19 +195,36 @@ int main () {
       // report the orphans
       for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
         const InputRow &orphanRow = *orphan;
-//        std::clog << "\t\t<==>\t" << orphanRow[1].Repr () << std::endl;
+        OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (boost::none, orphanRow);
+        OutputRow &outRow = *outRowPtr;
+
+        std::cout << outRow << std::endl;
+        //std::clog << "\t\t<==>\t" << orphanRow[1].Repr () << std::endl;
       }
     }
 
     // now report the match, if there is one
-    OutputRowFactory outRowFactory (inputColumns, outputColumns);
-
     const InputRow &leftMatch = *stepSearchRetVal.mLeftIt;
     const InputRow &rightMatch = *stepSearchRetVal.mRightIt;
 
-    OutputRow outRow = outRowFactory.CreateOutputRow (leftMatch, rightMatch);
+    OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (leftMatch, rightMatch);
+    OutputRow &outRow = *outRowPtr;
 
-    std::cout << outRow;
+    std::cout << outRow << std::endl;
+    //std::clog << leftMatch[1].Repr () << "\t<==>\t" << rightMatch[1].Repr () << std::endl;
+
+/*
+    for (OutputRow::const_iterator cellIt = outRow.begin (); cellIt != outRow.end (); ++cellIt)
+    {
+      OptCellPtr optCellPtr = *cellIt;
+      if (optCellPtr) {
+        CellPtr cellPtr = *optCellPtr;
+        const Cell &cell = *cellPtr;
+        const std::string repr = cell.Repr ();
+        std::cout << repr << std::endl;
+      }
+    }
+*/
 
     // advance and iterate
     leftRowIt = std::next (stepSearchRetVal.mLeftIt);
