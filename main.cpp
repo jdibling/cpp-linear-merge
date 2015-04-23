@@ -24,8 +24,9 @@ typedef io::filtering_istream istream;
 
 #include "util/csv.hpp"
 #include "column/Column.hpp"
-#include "row/Row.hpp"
+#include "row/InputRow.hpp"
 #include "StepSearch.hpp"
+#include "row/OutputRowFactory.hpp"
 
 namespace csv = pico::util::csv;
 
@@ -41,13 +42,13 @@ namespace {
 
 int main () {
   // Open the source files
-//  fs::path srcPath = "/home/john/Documents/sample";
-//  fs::path leftPath = srcPath / "SPY-BD-quote.txt";
-//  fs::path rightPath = srcPath / "SPY-Z-quote.txt";
+  fs::path srcPath = "/home/john/Documents/sample";
+  fs::path leftPath = srcPath / "SPY-BD-quote.txt";
+  fs::path rightPath = srcPath / "SPY-Z-quote.txt";
 
-  fs::path srcPath = "/home/john/bbo/20150421";
-  fs::path leftPath = srcPath / "/TotalView/ID/quote/SPY-ID-quote.txt";
-  fs::path rightPath = srcPath / "/Cqs/T/quote/SPY-T-quote.txt";
+//  fs::path srcPath = "/home/john/bbo/20150421";
+//  fs::path leftPath = srcPath / "/TotalView/ID/quote/SPY-ID-quote.txt";
+//  fs::path rightPath = srcPath / "/Cqs/T/quote/SPY-T-quote.txt";
 
   if (!fs::exists (leftPath)) {
     std::cerr << "Left file '" << leftPath << "' does not exist!" << std::endl;
@@ -90,11 +91,15 @@ int main () {
     Column ("AskVenue", CellType::Text)
   };
 
+  Columns outputColumns {
+    Column ("LatDiff", CellType::Diff, Importance::Output)
+  };
+
   csv::Row csvRow;
   // read the left file & create an input row
   Rows leftInput;
   while ((*leftStream) >> csvRow) {
-    Row inputRow;
+    InputRow inputRow;
 
     for (size_t idx = 0; idx < csvRow.size (); ++idx) {
       const std::string &cellData = csvRow[idx];
@@ -113,7 +118,7 @@ int main () {
   // read the right file & create an input row
   Rows rightInput;
   while ((*rightStream) >> csvRow) {
-    Row inputRow;
+    InputRow inputRow;
 
     for (size_t idx = 0; idx < csvRow.size (); ++idx) {
       const std::string &cellData = csvRow[idx];
@@ -139,8 +144,8 @@ int main () {
     ) {
     const bool atLeftEnd = (leftRowIt == leftEnd);
     const bool atRightEnd = (rightRowIt == rightEnd);
-    const Row &leftRow = *leftRowIt;
-    const Row &rightRow = *rightRowIt;
+    const InputRow &leftRow = *leftRowIt;
+    const InputRow &rightRow = *rightRowIt;
     const std::string &leftSeq = leftRow[1].Repr ();
     const std::string &rightSeq = rightRow[1].Repr ();
 
@@ -160,7 +165,7 @@ int main () {
 
       // report the orphans
       for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
-        const Row &orphanRow = *orphan;
+        const InputRow &orphanRow = *orphan;
 //        std::clog << orphanRow[1].Repr () << " <==>" << std::endl;
       }
     }
@@ -179,30 +184,20 @@ int main () {
 
       // report the orphans
       for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
-        const Row &orphanRow = *orphan;
+        const InputRow &orphanRow = *orphan;
 //        std::clog << "\t\t<==>\t" << orphanRow[1].Repr () << std::endl;
       }
     }
 
     // now report the match, if there is one
-    //   if (is_one_of (stepSearchRetVal.mWhichAdvanced, SearchSide::Left, SearchSide::Right, SearchSide::Neither))
-    {
-      const Row &leftMatch = *stepSearchRetVal.mLeftIt;
-      const Row &rightMatch = *stepSearchRetVal.mRightIt;
+    OutputRowFactory outRowFactory (inputColumns, outputColumns);
 
-      CellFactory cf (CellFactory::Type::Diff);
-      CellPtr diffCell = cf.CreateMergeCell (rightMatch[0], leftMatch[0]);
+    const InputRow &leftMatch = *stepSearchRetVal.mLeftIt;
+    const InputRow &rightMatch = *stepSearchRetVal.mRightIt;
 
-//      CellFactory cf (CellType::Latency);
-//      CellPtr latencyCell = cf.CreateMergeCell (leftMatch, rightMatch);
+    OutputRow outRow = outRowFactory.CreateOutputRow (leftMatch, rightMatch);
 
-      std::clog
-      << leftMatch[1].Repr ()
-      << "\t<==>\t"
-      << rightMatch[1].Repr ()
-         << "\t" << diffCell->Repr ()
-      << std::endl;
-    }
+    std::cout << outRow;
 
     // advance and iterate
     leftRowIt = std::next (stepSearchRetVal.mLeftIt);

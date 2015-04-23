@@ -13,7 +13,8 @@ class Column {
 public:
   enum class Importance {
     Key,
-    Unimportant
+    Unimportant,
+    Output
   };
 
   Column (const std::string &name, CellFactory::Type type,

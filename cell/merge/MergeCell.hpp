@@ -6,7 +6,7 @@
 #define LMERGE_MERGECELL_H
 
 #include "../Cell.hpp"
-#include "../../row/Row.hpp"
+#include "../../row/InputRow.hpp"
 
 class MergeCell
   :

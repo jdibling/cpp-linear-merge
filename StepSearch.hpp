@@ -5,7 +5,7 @@
 #ifndef LMERGE_STEPSEARCH_HPP
 #define LMERGE_STEPSEARCH_HPP
 
-#include "row/Row.hpp"
+#include "row/InputRow.hpp"
 #include "column/Column.hpp"
 
 enum class SearchSide {
@@ -51,15 +51,15 @@ StepSearchResults StepSearch (const Rows::const_iterator leftBegin,
   Rows::const_iterator leftIt = leftBegin;
   Rows::const_iterator rightIt = rightBegin;
 
-  const Row &leftAnchor = *leftBegin;
-  const Row &rightAnchor = *rightBegin;
+  const InputRow &leftAnchor = *leftBegin;
+  const InputRow &rightAnchor = *rightBegin;
 
   // continue stepping until we reach the last element on both sides
   const Rows::const_iterator leftLastIt = std::prev (leftEnd);
   const Rows::const_iterator rightLastIt = std::prev (rightEnd);
   while (!(leftIt == leftLastIt && rightIt == rightLastIt)) {
-    const Row &leftRow = *leftIt;
-    const Row &rightRow = *rightIt;
+    const InputRow &leftRow = *leftIt;
+    const InputRow &rightRow = *rightIt;
 
     if (Equ (leftRow, rightRow, columns)) {
       return StepSearchResults (leftIt, rightIt, SearchSide::Both);
