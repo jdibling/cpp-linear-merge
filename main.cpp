@@ -74,26 +74,30 @@ int main () {
 
   // Get ready to read the inputs
   Columns inputColumns {
-    Column ("RecvTime", CellType::UInt),
-    Column ("SeqNum", CellType::UInt),
-    Column ("Ticker", CellType::Text),
-    Column ("BidSide", CellType::Text),
-    Column ("BidPrice", CellType::Text, Importance::Key),
-    Column ("BidSizeRaw", CellType::UInt),
-    Column ("BidSize", CellType::UInt, Importance::Key),
-    Column ("BidTime", CellType::Text),
-    Column ("BidVenue", CellType::Text),
-    Column ("AskSide", CellType::Text),
-    Column ("AskPrice", CellType::Text, Importance::Key),
-    Column ("AskSizeRaw", CellType::UInt),
-    Column ("AskSize", CellType::UInt, Importance::Key),
-    Column ("AskTime", CellType::Text),
-    Column ("AskVenue", CellType::Text)
+    Column ("RecvTime", UInt ()),
+    Column ("SeqNum", UInt ()),
+    Column ("Ticker", Text ()),
+    Column ("BidSide", Text ()),
+    Column ("BidPrice", Text (), Importance::Key),
+    Column ("BidSizeRaw", UInt ()),
+    Column ("BidSize", UInt (), Importance::Key),
+    Column ("BidTime", Text ()),
+    Column ("BidVenue", Text ()),
+    Column ("AskSide", Text ()),
+    Column ("AskPrice", Text (), Importance::Key),
+    Column ("AskSizeRaw", UInt ()),
+    Column ("AskSize", UInt (), Importance::Key),
+    Column ("AskTime", Text ()),
+    Column ("AskVenue", Text ())
   };
 
   Columns outputColumns {
-    Column ("LatDiff", CellType::Diff, Importance::Output)
+    Column ("LatDiff", Diff (), Importance::Output)
   };
+
+//  Columns testColumns {
+//    Column ("LatDiff", Diff (Right ("RecvTime"), Left("RecvTime")));
+//  };
 
   csv::Row csvRow;
   // read the left file & create an input row

@@ -17,7 +17,8 @@ public:
     Output
   };
 
-  Column (const std::string &name, CellFactory::Type type,
+  Column (const std::string &name,
+          CellFactory cellFactory,
           Importance importance = Importance::Unimportant);  // constructor for input input cell column
   ~Column ();
 

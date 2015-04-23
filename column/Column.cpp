@@ -4,11 +4,11 @@
 
 #include "Column.hpp"
 
-Column::Column (const std::string &name, CellFactory::Type type, Importance importance)
+Column::Column (const std::string &name, CellFactory cellFactory, Importance importance)
   :
   mName (name),
   mImportance (importance),
-  mCellFactory (type) {
+  mCellFactory (cellFactory) {
 }
 
 Column::~Column () {

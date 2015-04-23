@@ -32,7 +32,19 @@ private:
   const Type mType;
 };
 
-typedef CellFactory::Type CellType;
+template<CellFactory::Type FactoryType>
+struct GenericFactory
+  :
+    public CellFactory {
+public:
+  GenericFactory ()
+    :
+    CellFactory (FactoryType) { }
+};
+
+typedef GenericFactory<CellFactory::Type::Text> Text;
+typedef GenericFactory<CellFactory::Type::UInt> UInt;
+typedef GenericFactory<CellFactory::Type::Diff> Diff;
 
 
 #endif //LMERGE_CELLFACTORY_H
