@@ -7,6 +7,7 @@
 
 
 #include "Cell.hpp"
+#include "../row/InputRow.hpp"
 
 class CellFactory {
 public:
@@ -26,7 +27,7 @@ public:
 
   CellPtr CreateInputCell (const std::string &data) const;
 
-  CellPtr CreateMergeCell (const Cell &left, const Cell &right) const;
+  CellPtr CreateMergeCell (InputRow const &left, InputRow const &right) const;
 
 private:
   const Type mType;

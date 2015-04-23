@@ -6,6 +6,7 @@
 #define LMERGE_STEPSEARCH_HPP
 
 #include "row/InputRow.hpp"
+#include "row/RowUtils.hpp"
 #include "column/Column.hpp"
 
 enum class SearchSide {

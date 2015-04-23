@@ -15,7 +15,6 @@
 #include <boost/utility/result_of.hpp>
 
 #include "../cell/Cell.hpp"
-#include "../column/Column.hpp"
 
 //typedef std::vector <CellPtr> Row;
 
@@ -55,30 +54,8 @@ public:
   void push_back (const Val &val) { mCells.push_back (val); }
 };
 
-inline bool Equ (const InputRow &lhs, const InputRow &rhs, const Columns &columns) {
-  // assumption: lhs, rhs and columns all have the same number of elements
-  for (size_t idx = 0; idx != lhs.size (); ++idx) {
-    const Cell &lhc = lhs[idx];
-    const Cell &rhc = rhs[idx];
-    const Column &col = columns[idx];
-
-    if (col.mImportance == Column::Importance::Key) {
-      if (lhc != rhc) {
-        return false;
-      }
-    }
-  }
-
-  return true;
-}
-
 typedef std::vector<InputRow> Rows;
 
-template<typename Str>
-Str &operator<< (Str &str, const InputRow &row) {
-  str << join (row, ",");
-  return str;
-}
 
 
 #endif //LMERGE_ROW_H

@@ -33,7 +33,7 @@ OutputRowPtr OutputRowFactory::CreateOutputRow (boost::optional<InputRow> leftIn
   for (size_t idx = 0; idx < mOutputColumns.size (); ++idx) {
     if (rightInput && leftInput) {
       const CellFactory &cf = mOutputColumns[idx].mCellFactory;
-      CellPtr outCell = cf.CreateMergeCell ((*leftInput)[0], (*rightInput)[0]);
+      CellPtr outCell = cf.CreateMergeCell ((*leftInput), (*rightInput));
       outputRow.push_back (outCell);
     }
     else {
