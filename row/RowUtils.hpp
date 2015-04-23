@@ -5,6 +5,9 @@
 #ifndef LMERGE_ROWUTILS_HPP
 #define LMERGE_ROWUTILS_HPP
 
+#include "InputRow.hpp"
+#include "../column/Column.hpp"
+
 inline bool Equ (const InputRow &lhs, const InputRow &rhs, const Columns &columns) {
   // assumption: lhs, rhs and columns all have the same number of elements
   for (size_t idx = 0; idx != lhs.size (); ++idx) {

@@ -24,6 +24,10 @@ public:
 
   CellPtr CreateInputCell (const std::string &data) const;
 
+  bool operator== (const std::string &colName) const {
+    return colName == mName;
+  }
+
   const std::string mName;
   const Importance mImportance;
   const CellFactory mCellFactory;

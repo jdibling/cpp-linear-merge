@@ -95,9 +95,9 @@ int main () {
     Column ("LatDiff", Diff (), Importance::Output)
   };
 
-//  Columns testColumns {
-//    Column ("LatDiff", Diff (Right ("RecvTime"), Left("RecvTime")));
-//  };
+  Columns testColumns {
+    Column ("LatDiff", Diff (Right ("RecvTime"), Left ("RecvTime")));
+  };
 
   csv::Row csvRow;
   // read the left file & create an input row

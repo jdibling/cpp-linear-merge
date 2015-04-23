@@ -33,6 +33,7 @@ public:
   decltype (mCells)::size_type
 
   size () const { return mCells.size (); }
+
   iterator begin () { return mCells.begin (); }
   const_iterator begin () const { return mCells.begin (); }
 
@@ -52,6 +53,8 @@ public:
 
   template<typename Val>
   void push_back (const Val &val) { mCells.push_back (val); }
+
+  std::string Repr () const;
 };
 
 typedef std::vector<InputRow> Rows;

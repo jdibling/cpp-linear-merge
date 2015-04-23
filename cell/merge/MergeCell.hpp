@@ -12,27 +12,23 @@ class MergeCell
   :
     public Cell {
 public:
-  enum class Side {
-    Left,
-    Right
-  };
 
-  MergeCell (const Cell &left, const Cell &right)
-    :
-    mLeft (left),
-    mRight (right) {
-  }
-
-  inline const Cell &Orig (Side side) const {
-    switch (side) {
-      case Side::Left: return mLeft;
-      case Side::Right: return mRight;
-    }
-  }
+//  MergeCell (const InputRow& left, const InputRow& right)
+//    :
+//    mLeft (left),
+//    mRight (right) {
+//  }
+//
+//  inline const InputRow& Orig (Side side) const {
+//    switch (side) {
+//      case Side::Left: return mLeft;
+//      case Side::Right: return mRight;
+//    }
+//  }
 
 protected:
-  const Cell &mLeft;
-  const Cell &mRight;
+//  const InputRow& mLeft;
+//  const InputRow& mRight;
 };
 
 

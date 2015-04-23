@@ -18,6 +18,8 @@ public:
 
     // Computed (merge) cells
       Diff,
+    Left,
+    Right
   };
 
   CellFactory (Type type)
@@ -46,6 +48,7 @@ public:
 typedef GenericFactory<CellFactory::Type::Text> Text;
 typedef GenericFactory<CellFactory::Type::UInt> UInt;
 typedef GenericFactory<CellFactory::Type::Diff> Diff;
-
+typedef GenericFactory<CellFactory::Type::Left> Left;
+typedef GenericFactory<CellFactory::Type::Right> Right;
 
 #endif //LMERGE_CELLFACTORY_H
