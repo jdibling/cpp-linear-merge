@@ -24,7 +24,6 @@ typedef io::filtering_istream istream;
 
 #include "util/csv.hpp"
 #include "column/Column.hpp"
-#include "row/InputRow.hpp"
 #include "StepSearch.hpp"
 #include "row/OutputRowFactory.hpp"
 
@@ -91,13 +90,13 @@ int main () {
     Column ("AskVenue", Text ())
   };
 
-  Columns outputColumns {
-    Column ("LatDiff", Diff (), Importance::Output)
-  };
-
-//  Columns testColumns {
-//    Column ("LatDiff", Diff (Right ("RecvTime"), Left("RecvTime")));
+//  Columns outputColumns {
+//    Column ("LatDiff", Diff (), Importance::Output)
 //  };
+
+  Columns outputColumns {
+    Column ("LatDiff", Diff (Right ("RecvTime"), Left ("RecvTime")))
+  };
 
   csv::Row csvRow;
   // read the left file & create an input row

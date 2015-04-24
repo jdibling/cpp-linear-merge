@@ -18,6 +18,7 @@ public:
 
     // Computed (merge) cells
       Diff,
+    Select
   };
 
   CellFactory (Type type)
@@ -45,7 +46,58 @@ public:
 
 typedef GenericFactory<CellFactory::Type::Text> Text;
 typedef GenericFactory<CellFactory::Type::UInt> UInt;
-typedef GenericFactory<CellFactory::Type::Diff> Diff;
+//typedef GenericFactory<CellFactory::Type::Diff> Diff;
+
+enum class Side {
+  Left,
+  Right
+};
+
+class Select
+  :
+    public GenericFactory<CellFactory::Type::Select> {
+  const std::string mColName;
+  const Side mSide;
+public:
+  Select (const std::string &colName, Side side)
+    :
+    mColName (colName),
+    mSide (side) {
+  }
+};
+
+class Left
+  :
+    public Select {
+public:
+  Left (const std::string &colName)
+    :
+    Select (colName, Side::Left) {
+  }
+};
+
+class Right
+  :
+    public Select {
+public:
+  Right (const std::string &colName)
+    :
+    Select (colName, Side::Right) {
+  }
+};
+
+class Diff
+  :
+    public GenericFactory<CellFactory::Type::Diff> {
+  const Select &mFirst;
+  const Select &mSecond;
+public:
+  Diff (const Select &first, const Select &second)
+    :
+    mFirst (first),
+    mSecond (second) {
+  }
+};
 
 
 #endif //LMERGE_CELLFACTORY_H
