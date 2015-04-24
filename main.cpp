@@ -149,11 +149,13 @@ int main (int argc, char **argv) {
       }
 
       // report the orphans
-      for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
-        const InputRow &orphanRow = *orphan;
-        OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (orphanRow, boost::none);
-        OutputRow &outRow = *outRowPtr;
-        (*options.mOutputStream) << outRow << std::endl;
+      if (options.mWriteOrphans) {
+        for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
+          const InputRow &orphanRow = *orphan;
+          OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (orphanRow, boost::none);
+          OutputRow &outRow = *outRowPtr;
+          (*options.mOutputStream) << outRow << std::endl;
+        }
       }
     }
 
@@ -170,12 +172,14 @@ int main (int argc, char **argv) {
       }
 
       // report the orphans
-      for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
-        const InputRow &orphanRow = *orphan;
-        OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (boost::none, orphanRow);
-        OutputRow &outRow = *outRowPtr;
+      if (options.mWriteOrphans) {
+        for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
+          const InputRow &orphanRow = *orphan;
+          OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (boost::none, orphanRow);
+          OutputRow &outRow = *outRowPtr;
 
-        (*options.mOutputStream) << outRow << std::endl;
+          (*options.mOutputStream) << outRow << std::endl;
+        }
       }
     }
 

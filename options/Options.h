@@ -22,6 +22,8 @@ public:
   IStreamPtr mLeftStream;
   IStreamPtr mRightStream;
   OStreamPtr mOutputStream;
+  bool mWriteOrphans;
+  bool mWriteMatches;
 };
 
 class OptionsFactory {

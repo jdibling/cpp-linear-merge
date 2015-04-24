@@ -57,6 +57,24 @@ namespace detail {
   }
 }
 
+std::pair<std::string, std::string> parse_negate (const std::string &option) {
+  if (option.find ("--no-") == 0) {
+    std::string negOption = option.substr (4);
+    negOption = "orphans";
+    return std::make_pair (negOption, std::string ("false"));
+  }
+  else {
+    return std::make_pair (std::string (), std::string ());
+  }
+}
+
+std::pair<std::string, std::string> reg_foo (const std::string &s) {
+  if (s.find ("--no") == 0) {
+    return std::make_pair (s.substr (5), std::string ("false"));
+  }
+  return std::make_pair (std::string (), std::string ());
+}
+
 Options OptionsFactory::Create () const {
   Options ret;
   ret.mTerminate = false;
@@ -82,10 +100,23 @@ Options OptionsFactory::Create () const {
     ("read-gzip,z", po::value<bool> (&readGzip)->implicit_value (true)->zero_tokens ()->default_value (false),
      "Input files are gzipped (true|false) [optional, default: false]")
     ("write-gzip,Z", po::value<bool> (&writeGzip)->default_value (false)->implicit_value (true)->zero_tokens (),
-     "Output files are gzipped (true|false) [optional, default: false]");
-
+     "Output files are gzipped (true|false) [optional, default: false]")
+    ("orphans", po::value<decltype (ret.mWriteOrphans)> ()->default_value ("true")->implicit_value ("true"),
+     "just an option")
+    ("matches", po::value<decltype (ret.mWriteMatches)> ()->default_value ("true")->implicit_value ("true"),
+     "just an option");
   po::variables_map vm;
-  po::store (po::parse_command_line (mArgc, mArgv, desc), vm);
+  po::store (po::command_line_parser (mArgc, mArgv)
+               .options (desc)
+                 //.extra_parser(parse_negate)
+               .extra_parser (reg_foo)
+               .run (),
+             vm);
+
+  ret.mWriteMatches = vm["matches"].as<bool> ();
+  ret.mWriteOrphans = vm["orphans"].as<bool> ();
+  std::cout << "Write Orphans: " << std::boolalpha << ret.mWriteOrphans << std::endl;
+  std::cout << "Write Matches: " << std::boolalpha << ret.mWriteMatches << std::endl;
 
   // check for help request first
   if (vm.count ("help")) {
@@ -109,7 +140,7 @@ Options OptionsFactory::Create () const {
     }
   }
 
-  if (writeGzip && vm.count ("out-path") && outPath.extension () != ".gz") {
+  if (writeGzip && vm.count ("out-file") && outPath.extension () != ".gz") {
     fs::path newPath = outPath.leaf () + ".gz";
     outPath.remove_leaf () /= newPath;
   }
@@ -167,7 +198,6 @@ Options OptionsFactory::Create () const {
 
   // parse the output destination
   if (vm.count ("out-file")) {
-    outPath = vm["out-file"].as<std::remove_reference<decltype (outPath)>::type> ();
     ret.mOutputStream = detail::OpenOutputFile (outPath, writeGzip);
     std::clog << "Opened output file " << outPath << std::endl;
   }
