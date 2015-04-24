@@ -22,6 +22,7 @@ public:
   IStreamPtr mLeftStream;
   IStreamPtr mRightStream;
   OStreamPtr mOutputStream;
+  OStreamPtr mLogStream;
   bool mWriteOrphans;
   bool mWriteMatches;
 };

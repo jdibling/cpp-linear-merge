@@ -86,6 +86,8 @@ Options OptionsFactory::Create () const {
   fs::path leftPath;
   fs::path rightPath;
   fs::path outPath;
+  fs::path logPath;
+
   bool readGzip = false;
   bool writeGzip = false;
 
@@ -97,6 +99,8 @@ Options OptionsFactory::Create () const {
     ("right-file,r", po::value<decltype (rightPath)> (&rightPath), "second file for merging (fq path) [required]")
     ("out-file,o", po::value<decltype (outPath)> (&outPath),
      "output file for merged files (fq path) [optional, default:stdout]")
+    ("log-file,o", po::value<decltype (logPath)> (&logPath),
+     "output file for merge log (fq path) [optional, default:stderr]")
     ("read-gzip,z", po::value<bool> (&readGzip)->implicit_value (true)->zero_tokens ()->default_value (false),
      "Input files are gzipped (true|false) [optional, default: false]")
     ("write-gzip,Z", po::value<bool> (&writeGzip)->default_value (false)->implicit_value (true)->zero_tokens (),
@@ -115,8 +119,6 @@ Options OptionsFactory::Create () const {
 
   ret.mWriteMatches = vm["matches"].as<bool> ();
   ret.mWriteOrphans = vm["orphans"].as<bool> ();
-  std::cout << "Write Orphans: " << std::boolalpha << ret.mWriteOrphans << std::endl;
-  std::cout << "Write Matches: " << std::boolalpha << ret.mWriteMatches << std::endl;
 
   // check for help request first
   if (vm.count ("help")) {
@@ -144,6 +146,27 @@ Options OptionsFactory::Create () const {
     fs::path newPath = outPath.leaf () + ".gz";
     outPath.remove_leaf () /= newPath;
   }
+
+  // parse the logfile destination
+  if (vm.count ("log-file")) {
+    ret.mLogStream = detail::OpenOutputFile (logPath, false);
+    (*ret.mLogStream) << "Opened log file " << logPath << std::endl;
+  }
+  else {
+    ret.mLogStream = detail::OpenOutputFile (boost::none, false);
+    (*ret.mLogStream) << "Writing output to stdout" << std::endl;
+  }
+
+  // parse the output destination
+  if (vm.count ("out-file")) {
+    ret.mOutputStream = detail::OpenOutputFile (outPath, writeGzip);
+    (*ret.mLogStream) << "Opened output file " << outPath << std::endl;
+  }
+  else {
+    ret.mOutputStream = detail::OpenOutputFile (boost::none, writeGzip);
+    (*ret.mLogStream) << "Writing output to stdout" << std::endl;
+  }
+
   typedef boost::tuple<std::string, std::string, fs::path *, IStreamPtr *> FileCheck;
   typedef std::vector<FileCheck> FileChecks;
   FileChecks fileChecks = {
@@ -159,7 +182,7 @@ Options OptionsFactory::Create () const {
 
     // make sure the parameter was specified
     if (!vm.count (param)) {
-      std::cerr << "Required parameter missing: " << param << std::endl;
+      (*ret.mLogStream) << "Required parameter missing: " << param << std::endl;
       ret.mTerminate = true;
       ret.mReturnCode = 3;
       return ret;
@@ -170,6 +193,7 @@ Options OptionsFactory::Create () const {
     path = fs::complete (path);
     if (!fs::exists (path)) {
       std::cerr << side << " file " << path << " not found." << std::endl;
+      (*ret.mLogStream) << side << " file " << path << " not found." << std::endl;
       ret.mTerminate = true;
       ret.mReturnCode = 2;
       return ret;
@@ -178,6 +202,7 @@ Options OptionsFactory::Create () const {
     // it needs to be a regular file
     if (!fs::is_regular_file (path)) {
       std::cerr << side << " exists, but is not a regular file." << std::endl;
+      (*ret.mLogStream) << side << " exists, but is not a regular file." << std::endl;
       ret.mTerminate = true;
       ret.mReturnCode = 4;
       return ret;
@@ -187,23 +212,15 @@ Options OptionsFactory::Create () const {
     streamPtr = detail::OpenInputFile (path, readGzip);
     if (!streamPtr) {
       std::cerr << "Error opening file stream for " << side << " file: " << path << std::endl;
+      (*ret.mLogStream) << "Error opening file stream for " << side << " file: " << path << std::endl;
       ret.mTerminate = true;
       ret.mReturnCode = 5;
       return ret;
     }
 
     // done
-    std::clog << "Opened " << side << " file " << path << ", " << fs::file_size (path) << " bytes." << std::endl;
-  }
-
-  // parse the output destination
-  if (vm.count ("out-file")) {
-    ret.mOutputStream = detail::OpenOutputFile (outPath, writeGzip);
-    std::clog << "Opened output file " << outPath << std::endl;
-  }
-  else {
-    ret.mOutputStream = detail::OpenOutputFile (boost::none, writeGzip);
-    std::clog << "Writing output to stdout" << std::endl;
+    (*ret.mLogStream) << "Opened " << side << " file " << path << ", " << fs::file_size (path) << " bytes." <<
+    std::endl;
   }
 
   // done parsing options, return

@@ -48,6 +48,7 @@ int main (int argc, char **argv) {
     return 0;
   }
 
+  OStream &LStr = *options.mLogStream;
 
   // Get ready to read the inputs
   Columns inputColumns {
@@ -79,10 +80,10 @@ int main (int argc, char **argv) {
   csv::Row csvRow;
   // read the left file & create an input row
   Rows leftInput;
-  std::clog << "Reading from left... ";
+  LStr << "Reading from left... ";
   while ((*options.mLeftStream) >> csvRow) {
     if (csvRow.size () != inputColumns.size ()) {
-      std::cerr << "Incomplete or malformed input from left: '" << csvRow.Raw () << "' -- skipping." << std::endl;
+      LStr << "Incomplete or malformed input from left: '" << csvRow.Raw () << "' -- skipping." << std::endl;
       continue;
     }
     InputRow inputRow;
@@ -95,14 +96,14 @@ int main (int argc, char **argv) {
 
     leftInput.push_back (std::move (inputRow));
   }
-  std::clog << "Done." << std::endl;
+  LStr << "Done." << std::endl;
 
   // read the right file & create an input row
   Rows rightInput;
-  std::clog << "Reading from right... ";
+  LStr << "Reading from right... ";
   while ((*options.mRightStream) >> csvRow) {
     if (csvRow.size () != inputColumns.size ()) {
-      std::cerr << "Incomplete or malformed input from right: '" << csvRow.Raw () << "' -- skipping." << std::endl;
+      LStr << "Incomplete or malformed input from right: '" << csvRow.Raw () << "' -- skipping." << std::endl;
       continue;
     }
     InputRow inputRow;
@@ -115,13 +116,16 @@ int main (int argc, char **argv) {
 
     rightInput.push_back (std::move (inputRow));
   }
-  std::clog << "Done." << std::endl;
+  LStr << "Done." << std::endl;
   // begin step searching from beginning
   const Rows::const_iterator leftEnd = std::end (leftInput);
   const Rows::const_iterator rightEnd = std::end (rightInput);
   OutputRowFactory outRowFactory (inputColumns, outputColumns);
 
   bool firstSearch = true;
+
+  size_t leftOrphans = 0;
+  size_t rightOrphans = 0;
 
   for (Rows::const_iterator leftRowIt = std::begin (leftInput),
          rightRowIt = std::begin (rightInput);
@@ -149,6 +153,7 @@ int main (int argc, char **argv) {
       }
 
       // report the orphans
+      leftOrphans += std::distance (firstOrphan, lastOrphan);
       if (options.mWriteOrphans) {
         for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
           const InputRow &orphanRow = *orphan;
@@ -172,6 +177,7 @@ int main (int argc, char **argv) {
       }
 
       // report the orphans
+      rightOrphans += std::distance (firstOrphan, lastOrphan);
       if (options.mWriteOrphans) {
         for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
           const InputRow &orphanRow = *orphan;
@@ -184,14 +190,16 @@ int main (int argc, char **argv) {
     }
 
     // now report the match, if there is one
-    if (!atLeftEnd && !atRightEnd) {
-      const InputRow &leftMatch = *stepSearchRetVal.mLeftIt;
-      const InputRow &rightMatch = *stepSearchRetVal.mRightIt;
+    if (options.mWriteMatches) {
+      if (!atLeftEnd && !atRightEnd) {
+        const InputRow &leftMatch = *stepSearchRetVal.mLeftIt;
+        const InputRow &rightMatch = *stepSearchRetVal.mRightIt;
 
-      OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (leftMatch, rightMatch);
-      OutputRow &outRow = *outRowPtr;
+        OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (leftMatch, rightMatch);
+        OutputRow &outRow = *outRowPtr;
 
-      (*options.mOutputStream) << outRow << std::endl;
+        (*options.mOutputStream) << outRow << std::endl;
+      }
     }
 
     // advance and iterate
@@ -203,6 +211,10 @@ int main (int argc, char **argv) {
     }
   }
 
+  LStr << "Left orphans: " << leftOrphans << "\n"
+  << "Right orphans: " << rightOrphans << "\n"
+  << "Total orphans: " << leftOrphans + rightOrphans
+  << std::endl;
 
   return 0;
 
