@@ -24,9 +24,10 @@ typedef io::filtering_istream istream;
 
 #include "util/csv.hpp"
 #include "column/Column.hpp"
-#include "row/InputRow.hpp"
 #include "StepSearch.hpp"
 #include "row/OutputRowFactory.hpp"
+
+#include "options/Options.h"
 
 namespace csv = pico::util::csv;
 
@@ -40,37 +41,14 @@ namespace {
 
 }
 
-int main () {
-  // Open the source files
-  fs::path srcPath = "/home/john/Documents/sample";
-  fs::path leftPath = srcPath / "SPY-BD-quote.txt";
-  fs::path rightPath = srcPath / "SPY-Z-quote.txt";
-
-//  fs::path srcPath = "/home/john/bbo/20150421";
-//  fs::path leftPath = srcPath / "/TotalView/ID/quote/SPY-ID-quote.txt";
-//  fs::path rightPath = srcPath / "/Cqs/T/quote/SPY-T-quote.txt";
-
-  if (!fs::exists (leftPath)) {
-    std::cerr << "Left file '" << leftPath << "' does not exist!" << std::endl;
-    return 2;
+int main (int argc, char **argv) {
+  OptionsFactory optionsFactory (argc, argv);
+  const Options options = optionsFactory.Create ();
+  if (options.mTerminate) {
+    return 0;
   }
 
-  //fs::path rightPath = srcPath / "SPY-BD-quote.txt";
-  if (!fs::exists (rightPath)) {
-    std::cerr << "Right file '" << rightPath << "' does not exist!" << std::endl;
-    return 2;
-  }
-
-  std::unique_ptr<istream> leftStream = OpenFile (leftPath);
-  if (!leftStream) {
-    return 3;
-  }
-  std::cout << "Opened Left file '" << leftPath << "': " << fs::file_size (leftPath) << " bytes." << std::endl;
-  std::unique_ptr<istream> rightStream = OpenFile (rightPath);
-  if (!rightStream) {
-    return 3;
-  }
-  std::cout << "Opened Right file '" << leftPath << "': " << fs::file_size (rightPath) << " bytes." << std::endl;
+  OStream &LStr = *options.mLogStream;
 
   // Get ready to read the inputs
   Columns inputColumns {
@@ -102,7 +80,12 @@ int main () {
   csv::Row csvRow;
   // read the left file & create an input row
   Rows leftInput;
-  while ((*leftStream) >> csvRow) {
+  LStr << "Reading from left... ";
+  while ((*options.mLeftStream) >> csvRow) {
+    if (csvRow.size () != inputColumns.size ()) {
+      LStr << "Incomplete or malformed input from left: '" << csvRow.Raw () << "' -- skipping." << std::endl;
+      continue;
+    }
     InputRow inputRow;
 
     for (size_t idx = 0; idx < csvRow.size (); ++idx) {
@@ -113,15 +96,16 @@ int main () {
 
     leftInput.push_back (std::move (inputRow));
   }
-  std::clog << "Read " << leftInput.size () << " lines from left." << "\n";
-//  for (size_t idx = 0; idx < leftInput.size (); ++idx) {
-//    const Row &row = leftInput[idx];
-//    std::clog << "[" << idx + 1 << "]:\t" << row << std::endl;
-//  }
-  
+  LStr << "Done." << std::endl;
+
   // read the right file & create an input row
   Rows rightInput;
-  while ((*rightStream) >> csvRow) {
+  LStr << "Reading from right... ";
+  while ((*options.mRightStream) >> csvRow) {
+    if (csvRow.size () != inputColumns.size ()) {
+      LStr << "Incomplete or malformed input from right: '" << csvRow.Raw () << "' -- skipping." << std::endl;
+      continue;
+    }
     InputRow inputRow;
 
     for (size_t idx = 0; idx < csvRow.size (); ++idx) {
@@ -132,18 +116,16 @@ int main () {
 
     rightInput.push_back (std::move (inputRow));
   }
-  std::clog << "Read " << rightInput.size () << " lines from right." << "\n";
-//  for (size_t idx = 0; idx < rightInput.size (); ++idx) {
-//    const Row &row = rightInput[idx];
-//    std::clog << "[" << idx + 1 << "]:\t" << row << std::endl;
-//  }
-
+  LStr << "Done." << std::endl;
   // begin step searching from beginning
   const Rows::const_iterator leftEnd = std::end (leftInput);
   const Rows::const_iterator rightEnd = std::end (rightInput);
   OutputRowFactory outRowFactory (inputColumns, outputColumns);
 
   bool firstSearch = true;
+
+  size_t leftOrphans = 0;
+  size_t rightOrphans = 0;
 
   for (Rows::const_iterator leftRowIt = std::begin (leftInput),
          rightRowIt = std::begin (rightInput);
@@ -154,8 +136,6 @@ int main () {
     const bool atRightEnd = (rightRowIt == rightEnd);
     const InputRow &leftRow = *leftRowIt;
     const InputRow &rightRow = *rightRowIt;
-    const std::string &leftSeq = leftRow[1].Repr ();
-    const std::string &rightSeq = rightRow[1].Repr ();
 
     StepSearchResults stepSearchRetVal = StepSearch (leftRowIt, leftEnd, rightRowIt, rightEnd, inputColumns,
                                                      firstSearch);
@@ -173,14 +153,14 @@ int main () {
       }
 
       // report the orphans
-      for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
-        const InputRow &orphanRow = *orphan;
-        OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (orphanRow, boost::none);
-        OutputRow &outRow = *outRowPtr;
-
-        std::cout << outRow << std::endl;
-
-        //std::clog << orphanRow[1].Repr () << " <==>" << std::endl;
+      leftOrphans += std::distance (firstOrphan, lastOrphan);
+      if (options.mWriteOrphans) {
+        for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
+          const InputRow &orphanRow = *orphan;
+          OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (orphanRow, boost::none);
+          OutputRow &outRow = *outRowPtr;
+          (*options.mOutputStream) << outRow << std::endl;
+        }
       }
     }
 
@@ -197,44 +177,44 @@ int main () {
       }
 
       // report the orphans
-      for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
-        const InputRow &orphanRow = *orphan;
-        OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (boost::none, orphanRow);
-        OutputRow &outRow = *outRowPtr;
+      rightOrphans += std::distance (firstOrphan, lastOrphan);
+      if (options.mWriteOrphans) {
+        for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
+          const InputRow &orphanRow = *orphan;
+          OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (boost::none, orphanRow);
+          OutputRow &outRow = *outRowPtr;
 
-        std::cout << outRow << std::endl;
-        //std::clog << "\t\t<==>\t" << orphanRow[1].Repr () << std::endl;
+          (*options.mOutputStream) << outRow << std::endl;
+        }
       }
     }
 
     // now report the match, if there is one
-    const InputRow &leftMatch = *stepSearchRetVal.mLeftIt;
-    const InputRow &rightMatch = *stepSearchRetVal.mRightIt;
+    if (options.mWriteMatches) {
+      if (!atLeftEnd && !atRightEnd) {
+        const InputRow &leftMatch = *stepSearchRetVal.mLeftIt;
+        const InputRow &rightMatch = *stepSearchRetVal.mRightIt;
 
-    OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (leftMatch, rightMatch);
-    OutputRow &outRow = *outRowPtr;
+        OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (leftMatch, rightMatch);
+        OutputRow &outRow = *outRowPtr;
 
-    std::cout << outRow << std::endl;
-    //std::clog << leftMatch[1].Repr () << "\t<==>\t" << rightMatch[1].Repr () << std::endl;
-
-/*
-    for (OutputRow::const_iterator cellIt = outRow.begin (); cellIt != outRow.end (); ++cellIt)
-    {
-      OptCellPtr optCellPtr = *cellIt;
-      if (optCellPtr) {
-        CellPtr cellPtr = *optCellPtr;
-        const Cell &cell = *cellPtr;
-        const std::string repr = cell.Repr ();
-        std::cout << repr << std::endl;
+        (*options.mOutputStream) << outRow << std::endl;
       }
     }
-*/
 
     // advance and iterate
-    leftRowIt = std::next (stepSearchRetVal.mLeftIt);
-    rightRowIt = std::next (stepSearchRetVal.mRightIt);
+    if (!atLeftEnd) {
+      leftRowIt = std::next (stepSearchRetVal.mLeftIt);
+    }
+    if (!atRightEnd) {
+      rightRowIt = std::next (stepSearchRetVal.mRightIt);
+    }
   }
 
+  LStr << "Left orphans: " << leftOrphans << "\n"
+  << "Right orphans: " << rightOrphans << "\n"
+  << "Total orphans: " << leftOrphans + rightOrphans
+  << std::endl;
 
   return 0;
 

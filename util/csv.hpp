@@ -11,6 +11,7 @@ namespace csv {
     class Row {
         typedef std::vector<std::string> Cont;
         Cont mData;
+        std::string mRaw;
     public:
         typedef Cont::iterator iterator;
         typedef Cont::const_iterator const_iterator;
@@ -35,16 +36,18 @@ namespace csv {
 
         template<typename Str>
         void ReadLine(Str &str) {
-            std::string line;
-            std::getline(str, line);
+            mRaw.clear ();
+            std::getline (str, mRaw);
 
-            std::stringstream lineStream(line);
+            std::stringstream lineStream (mRaw);
 
             mData.clear();
             for (std::string cell; std::getline(lineStream, cell, ',');) {
                 mData.push_back(cell);
             }
         }
+
+        const std::string &Raw () const { return mRaw; }
 
     };
 
