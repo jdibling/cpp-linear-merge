@@ -15,13 +15,9 @@
     </ADDITIONAL_GENERATION_ENVIRONMENT>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7965187f-63e5-4b63-84e4-b0e44831114e" name="Default" comment="Fixed StepSearch &amp; implemented merge row outputting.">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/options/Options.cpp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/options/Options.h" />
+    <list default="true" id="7965187f-63e5-4b63-84e4-b0e44831114e" name="Default" comment="Implemented options for left, right &amp; output.  Fixed crash when processing malformed line.  Fixed crash iterating past end of file.">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/CMakeLists.txt" afterPath="$PROJECT_DIR$/CMakeLists.txt" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/StepSearch.hpp" afterPath="$PROJECT_DIR$/StepSearch.hpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/util/csv.hpp" afterPath="$PROJECT_DIR$/util/csv.hpp" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/main.cpp" afterPath="$PROJECT_DIR$/main.cpp" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/options/Options.cpp" afterPath="$PROJECT_DIR$/options/Options.cpp" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="qc.iws" />
@@ -58,11 +54,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="main.cpp" pinned="false" current-in-tab="true">
+          <file leaf-file-name="main.cpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/main.cpp">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.42137095">
-                  <caret line="137" column="43" selection-start-line="137" selection-start-column="43" selection-end-line="137" selection-end-column="43" />
+                <state vertical-scroll-proportion="0.0">
+                  <caret line="133" column="43" selection-start-line="133" selection-start-column="43" selection-end-line="133" selection-end-column="43" />
                   <folding>
                     <element signature="e#0#19#0" expanded="true" />
                     <element signature="e#511#534#0" expanded="true" />
@@ -91,25 +87,45 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="InputRow.hpp" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/row/InputRow.hpp">
+          <file leaf-file-name="Options.cpp" pinned="false" current-in-tab="true">
+            <entry file="file://$PROJECT_DIR$/options/Options.cpp">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.3326613">
+                  <caret line="96" column="0" selection-start-line="96" selection-start-column="0" selection-end-line="96" selection-end-column="0" />
+                  <folding>
+                    <element signature="e#38#55#0" expanded="true" />
+                    <element signature="e#575#603#0" expanded="true" />
+                  </folding>
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="throw_exception.hpp" pinned="false" current-in-tab="false">
+            <entry file="file:///usr/include/boost/throw_exception.hpp">
               <provider selected="true" editor-type-id="text-editor">
                 <state vertical-scroll-proportion="0.0">
-                  <caret line="50" column="0" selection-start-line="50" selection-start-column="0" selection-end-line="50" selection-end-column="0" />
+                  <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="Options.cpp" pinned="false" current-in-tab="false">
-            <entry file="file://$PROJECT_DIR$/options/Options.cpp">
+          <file leaf-file-name="variables_map.hpp" pinned="false" current-in-tab="false">
+            <entry file="file:///usr/include/boost/program_options/variables_map.hpp">
               <provider selected="true" editor-type-id="text-editor">
                 <state vertical-scroll-proportion="0.0">
-                  <caret line="161" column="0" selection-start-line="161" selection-start-column="0" selection-end-line="161" selection-end-column="0" />
-                  <folding>
-                    <element signature="e#38#55#0" expanded="true" />
-                    <element signature="e#489#517#0" expanded="true" />
-                  </folding>
+                  <caret line="73" column="55" selection-start-line="73" selection-start-column="55" selection-end-line="73" selection-end-column="55" />
+                  <folding />
+                </state>
+              </provider>
+            </entry>
+          </file>
+          <file leaf-file-name="parsers.hpp" pinned="false" current-in-tab="false">
+            <entry file="file:///usr/include/boost/program_options/detail/parsers.hpp">
+              <provider selected="true" editor-type-id="text-editor">
+                <state vertical-scroll-proportion="0.0">
+                  <caret line="103" column="0" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
+                  <folding />
                 </state>
               </provider>
             </entry>
@@ -126,31 +142,11 @@
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="operations.hpp" pinned="false" current-in-tab="false">
-            <entry file="file:///usr/include/boost/filesystem/operations.hpp">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="533" column="0" selection-start-line="533" selection-start-column="0" selection-end-line="533" selection-end-column="0" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
-          <file leaf-file-name="path.hpp" pinned="false" current-in-tab="false">
-            <entry file="file:///usr/include/boost/filesystem/path.hpp">
-              <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="57" column="58" selection-start-line="57" selection-start-column="58" selection-end-line="57" selection-end-column="58" />
-                  <folding />
-                </state>
-              </provider>
-            </entry>
-          </file>
           <file leaf-file-name="StepSearch.hpp" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/StepSearch.hpp">
               <provider selected="true" editor-type-id="text-editor">
                 <state vertical-scroll-proportion="0.0">
-                  <caret line="77" column="0" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
+                  <caret line="76" column="0" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
                   <folding>
                     <element signature="e#99#126#0" expanded="true" />
                   </folding>
@@ -166,29 +162,29 @@
             <entry file="file://$PROJECT_DIR$/options/Options.cpp">
               <provider selected="true" editor-type-id="text-editor">
                 <state vertical-scroll-proportion="0.0">
-                  <caret line="18" column="33" selection-start-line="18" selection-start-column="33" selection-end-line="18" selection-end-column="33" />
+                  <caret line="20" column="33" selection-start-line="20" selection-start-column="33" selection-end-line="20" selection-end-column="33" />
                   <folding>
                     <element signature="e#38#55#0" expanded="true" />
-                    <element signature="e#489#517#0" expanded="true" />
+                    <element signature="e#575#603#0" expanded="true" />
                   </folding>
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="false">
+          <file leaf-file-name="CMakeLists.txt" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.0">
-                  <caret line="13" column="81" selection-start-line="13" selection-start-column="81" selection-end-line="13" selection-end-column="81" />
+                <state vertical-scroll-proportion="0.54435486">
+                  <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
                   <folding />
                 </state>
               </provider>
             </entry>
           </file>
-          <file leaf-file-name="Options.h" pinned="false" current-in-tab="true">
+          <file leaf-file-name="Options.h" pinned="false" current-in-tab="false">
             <entry file="file://$PROJECT_DIR$/options/Options.h">
               <provider selected="true" editor-type-id="text-editor">
-                <state vertical-scroll-proportion="0.7983871">
+                <state vertical-scroll-proportion="0.0">
                   <caret line="22" column="26" selection-start-line="22" selection-start-column="26" selection-end-line="22" selection-end-column="26" />
                   <folding>
                     <element signature="e#89#120#0" expanded="true" />
@@ -257,12 +253,12 @@
         <option value="$PROJECT_DIR$/cell/CellFactory.cpp" />
         <option value="$PROJECT_DIR$/row/OutputRowFactory.cpp" />
         <option value="$PROJECT_DIR$/cell/merge/MergeCell.hpp" />
-        <option value="$PROJECT_DIR$/CMakeLists.txt" />
         <option value="$PROJECT_DIR$/options/Options.h" />
-        <option value="$PROJECT_DIR$/options/Options.cpp" />
         <option value="$PROJECT_DIR$/StepSearch.hpp" />
         <option value="$PROJECT_DIR$/util/csv.hpp" />
         <option value="$PROJECT_DIR$/main.cpp" />
+        <option value="$PROJECT_DIR$/CMakeLists.txt" />
+        <option value="$PROJECT_DIR$/options/Options.cpp" />
       </list>
     </option>
   </component>
@@ -483,7 +479,7 @@
       <recent name="$PROJECT_DIR$/cell" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.lmerge">
+  <component name="RunManager" selected="Application.lmerge gzip read">
     <configuration default="true" type="CMakeRunConfiguration" factoryName="Application" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="lmerge" TARGET_NAME="lmerge" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="lmerge" RUN_TARGET_NAME="lmerge">
       <envs />
       <method />
@@ -505,6 +501,10 @@
       <envs />
       <method />
     </configuration>
+    <configuration default="false" name="lmerge gzip read" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--left-file /home/john/bbo/20150423/TotalView/ID/quote/BP-ID-quote.txt --right-file /home/john/bbo/20150423/Cqs/T/quote/BP-T-quote.txt --out-file /home/john/scratch/BD.txt -z -Z" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="lmerge" TARGET_NAME="lmerge" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="lmerge" RUN_TARGET_NAME="lmerge">
+      <envs />
+      <method />
+    </configuration>
     <configuration default="false" name="lmerge-small files" type="CMakeRunConfiguration" factoryName="Application" PROGRAM_PARAMS="--left-file /home/john/Documents/sample/SPY-ID-quote.txt --right-file /home/john/Documents/sample/SPY-T-quote.txt --out-file /tmp/out" WORKING_DIR="" PASS_PARENT_ENVS="FALSE" PROJECT_NAME="lmerge" TARGET_NAME="lmerge" CONFIG_NAME="Debug" RUN_TARGET_PROJECT_NAME="lmerge" RUN_TARGET_NAME="lmerge">
       <envs />
       <method />
@@ -513,11 +513,12 @@
       <envs />
       <method />
     </configuration>
-    <list size="4">
+    <list size="5">
       <item index="0" class="java.lang.String" itemvalue="Application.Build All" />
       <item index="1" class="java.lang.String" itemvalue="Application.lmerge" />
-      <item index="2" class="java.lang.String" itemvalue="Application.lmerge-small files" />
-      <item index="3" class="java.lang.String" itemvalue="Application.lmerge-release" />
+      <item index="2" class="java.lang.String" itemvalue="Application.lmerge gzip read" />
+      <item index="3" class="java.lang.String" itemvalue="Application.lmerge-small files" />
+      <item index="4" class="java.lang.String" itemvalue="Application.lmerge-release" />
     </list>
   </component>
   <component name="ShelveChangesManager" show_recycled="false" />
@@ -615,7 +616,13 @@
       <option name="project" value="LOCAL" />
       <updated>1429828613281</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Implemented options for left, right &amp; output.  Fixed crash when processing malformed line.  Fixed crash iterating past end of file.">
+      <created>1429899937648</created>
+      <option name="number" value="00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1429899937648</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="ToolWindowManager">
@@ -674,6 +681,7 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
+    <option name="CHECK_CODE_SMELLS_BEFORE_PROJECT_COMMIT" value="false" />
     <option name="CHECK_CODE_CLEANUP_BEFORE_PROJECT_COMMIT" value="true" />
     <MESSAGE value="WIP: Smart Columns" />
     <MESSAGE value="Implemented sync point searching" />
@@ -683,55 +691,34 @@
     <MESSAGE value="Implemented Row.  Implemented loading both files from hardcoded locations." />
     <MESSAGE value="Implemented StepSearch &amp; file comparisons." />
     <MESSAGE value="Fixed StepSearch &amp; implemented merge row outputting." />
-    <option name="LAST_COMMIT_MESSAGE" value="Fixed StepSearch &amp; implemented merge row outputting." />
+    <MESSAGE value="Implemented options for left, right &amp; output.  Fixed crash when processing malformed line.  Fixed crash iterating past end of file." />
+    <option name="LAST_COMMIT_MESSAGE" value="Implemented options for left, right &amp; output.  Fixed crash when processing malformed line.  Fixed crash iterating past end of file." />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REFORMAT_BEFORE_PROJECT_COMMIT" value="true" />
     <option name="REARRANGE_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/options/Options.cpp</url>
+          <line>96</line>
+          <option name="timeStamp" value="63" />
+        </line-breakpoint>
+      </breakpoints>
       <breakpoints-dialog>
         <breakpoints-dialog />
       </breakpoints-dialog>
-      <option name="time" value="61" />
+      <option name="time" value="64" />
     </breakpoint-manager>
     <watches-manager>
       <configuration name="CMakeRunConfiguration">
-        <watch expression="leftRow" language="ObjectiveC" />
-        <watch expression="rightRow" language="ObjectiveC" />
-        <watch expression="idx" language="ObjectiveC" />
-        <watch expression="leftMatch" language="ObjectiveC" />
-        <watch expression="rightMatch" language="ObjectiveC" />
-        <watch expression="stepSearchRetVal.mWhichAdvanced" />
-        <watch expression="rightMatch.mCells[1]-&gt;Repr()" language="ObjectiveC" />
-        <watch expression="stepSearchRetVal" language="ObjectiveC" />
-        <watch expression="atLeftEnd" language="ObjectiveC" />
-        <watch expression="atRightEnd" language="ObjectiveC" />
+        <watch expression="leftPath" language="ObjectiveC" />
+        <watch expression="leftPath.string()" language="ObjectiveC" />
       </configuration>
     </watches-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/cell/Cell.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/cell/CellFactory.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/column/Column.hpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/row/InputRow.hpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
@@ -974,18 +961,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="13" column="81" selection-start-line="13" selection-start-column="81" selection-end-line="13" selection-end-column="81" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/include/boost/program_options/detail/value_semantic.hpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
           <caret line="187" column="0" selection-start-line="187" selection-start-column="0" selection-end-line="187" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -1009,27 +989,6 @@
         <state vertical-scroll-proportion="0.0">
           <caret line="57" column="58" selection-start-line="57" selection-start-column="58" selection-end-line="57" selection-end-column="58" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/options/Options.h">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.7983871">
-          <caret line="22" column="26" selection-start-line="22" selection-start-column="26" selection-end-line="22" selection-end-column="26" />
-          <folding>
-            <element signature="e#89#120#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/options/Options.cpp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0">
-          <caret line="161" column="0" selection-start-line="161" selection-start-column="0" selection-end-line="161" selection-end-column="0" />
-          <folding>
-            <element signature="e#38#55#0" expanded="true" />
-            <element signature="e#489#517#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1063,7 +1022,7 @@
     <entry file="file://$PROJECT_DIR$/StepSearch.hpp">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0">
-          <caret line="77" column="0" selection-start-line="77" selection-start-column="0" selection-end-line="77" selection-end-column="0" />
+          <caret line="76" column="0" selection-start-line="76" selection-start-column="0" selection-end-line="76" selection-end-column="0" />
           <folding>
             <element signature="e#99#126#0" expanded="true" />
           </folding>
@@ -1090,11 +1049,64 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.cpp">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.42137095">
-          <caret line="137" column="43" selection-start-line="137" selection-start-column="43" selection-end-line="137" selection-end-column="43" />
+        <state vertical-scroll-proportion="0.0">
+          <caret line="133" column="43" selection-start-line="133" selection-start-column="43" selection-end-line="133" selection-end-column="43" />
           <folding>
             <element signature="e#0#19#0" expanded="true" />
             <element signature="e#511#534#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/options/Options.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="22" column="26" selection-start-line="22" selection-start-column="26" selection-end-line="22" selection-end-column="26" />
+          <folding>
+            <element signature="e#89#120#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CMakeLists.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.54435486">
+          <caret line="15" column="0" selection-start-line="15" selection-start-column="0" selection-end-line="15" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/boost/program_options/detail/parsers.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="103" column="0" selection-start-line="103" selection-start-column="0" selection-end-line="103" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/boost/program_options/variables_map.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="73" column="55" selection-start-line="73" selection-start-column="55" selection-end-line="73" selection-end-column="55" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file:///usr/include/boost/throw_exception.hpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0">
+          <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/options/Options.cpp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.3326613">
+          <caret line="96" column="0" selection-start-line="96" selection-start-column="0" selection-end-line="96" selection-end-column="0" />
+          <folding>
+            <element signature="e#38#55#0" expanded="true" />
+            <element signature="e#575#603#0" expanded="true" />
           </folding>
         </state>
       </provider>

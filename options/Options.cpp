@@ -12,6 +12,8 @@
 #include <boost/tuple/tuple.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/zlib.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/optional.hpp>
 
@@ -30,15 +32,21 @@ OptionsFactory::OptionsFactory (int argc, char **argv)
 }
 
 namespace detail {
-  IStreamPtr OpenInputFile (const fs::path &path) {
+  IStreamPtr OpenInputFile (const fs::path &path, bool gzipped) {
     IStreamPtr ret = pstd::make_unique<IStream> ();
+    if (gzipped) {
+      ret->push (io::gzip_decompressor ());
+    }
     io::file_source fileSource (path.string ());
     ret->push (fileSource);
     return ret;
   }
 
-  OStreamPtr OpenOutputFile (boost::optional<fs::path> path) {
+  OStreamPtr OpenOutputFile (boost::optional<fs::path> path, bool gzipped) {
     OStreamPtr ret = pstd::make_unique<OStream> ();
+    if (gzipped) {
+      ret->push (io::gzip_compressor ());
+    }
     if (path) {
       ret->push (io::file_sink (path->string ()));
     }
@@ -60,14 +68,21 @@ Options OptionsFactory::Create () const {
   fs::path leftPath;
   fs::path rightPath;
   fs::path outPath;
+  bool readGzip = false;
+  bool writeGzip = false;
 
   // pull apart the command line
   po::options_description desc ("Options");
   desc.add_options ()
     ("help,h", "produce help message")
-    ("left-file,l", po::value<decltype (leftPath)> (), "first file for merging [required]")
-    ("right-file,r", po::value<decltype (rightPath)> (), "second file for merging [required]")
-    ("out-file,o", po::value<decltype (outPath)> (), "output file for merged files [optional, default:stdout]");
+    ("left-file,l", po::value<decltype (leftPath)> (&leftPath), "first file for merging (fq path) [required]")
+    ("right-file,r", po::value<decltype (rightPath)> (&rightPath), "second file for merging (fq path) [required]")
+    ("out-file,o", po::value<decltype (outPath)> (&outPath),
+     "output file for merged files (fq path) [optional, default:stdout]")
+    ("read-gzip,z", po::value<bool> (&readGzip)->implicit_value (true)->zero_tokens ()->default_value (false),
+     "Input files are gzipped (true|false) [optional, default: false]")
+    ("write-gzip,Z", po::value<bool> (&writeGzip)->default_value (false)->implicit_value (true)->zero_tokens (),
+     "Output files are gzipped (true|false) [optional, default: false]");
 
   po::variables_map vm;
   po::store (po::parse_command_line (mArgc, mArgv, desc), vm);
@@ -83,6 +98,21 @@ Options OptionsFactory::Create () const {
 
   po::notify (vm);
 
+  if (readGzip) {
+    if (leftPath.extension () != ".gz") {
+      fs::path newPath = leftPath.leaf () + ".gz";
+      leftPath.remove_leaf () /= newPath;
+    }
+    if (rightPath.extension () != ".gz") {
+      fs::path newPath = rightPath.leaf () + ".gz";
+      rightPath.remove_leaf () /= newPath;
+    }
+  }
+
+  if (writeGzip && vm.count ("out-path") && outPath.extension () != ".gz") {
+    fs::path newPath = outPath.leaf () + ".gz";
+    outPath.remove_leaf () /= newPath;
+  }
   typedef boost::tuple<std::string, std::string, fs::path *, IStreamPtr *> FileCheck;
   typedef std::vector<FileCheck> FileChecks;
   FileChecks fileChecks = {
@@ -103,7 +133,7 @@ Options OptionsFactory::Create () const {
       ret.mReturnCode = 3;
       return ret;
     }
-    path = vm[param].as<std::remove_reference<decltype (path)>::type> ();
+    //path = vm[param].as<std::remove_reference<decltype (path)>::type> ();
 
     // get an absolute path & ensure file existance
     path = fs::complete (path);
@@ -123,7 +153,7 @@ Options OptionsFactory::Create () const {
     }
 
     // open the file
-    streamPtr = detail::OpenInputFile (path);
+    streamPtr = detail::OpenInputFile (path, readGzip);
     if (!streamPtr) {
       std::cerr << "Error opening file stream for " << side << " file: " << path << std::endl;
       ret.mTerminate = true;
@@ -138,11 +168,11 @@ Options OptionsFactory::Create () const {
   // parse the output destination
   if (vm.count ("out-file")) {
     outPath = vm["out-file"].as<std::remove_reference<decltype (outPath)>::type> ();
-    ret.mOutputStream = detail::OpenOutputFile (outPath);
+    ret.mOutputStream = detail::OpenOutputFile (outPath, writeGzip);
     std::clog << "Opened output file " << outPath << std::endl;
   }
   else {
-    ret.mOutputStream = detail::OpenOutputFile (boost::none);
+    ret.mOutputStream = detail::OpenOutputFile (boost::none, writeGzip);
     std::clog << "Writing output to stdout" << std::endl;
   }
 
