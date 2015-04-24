@@ -4,19 +4,18 @@
 
 #ifndef QC_CSV_HPP
 #define QC_CSV_HPP
-
-#include <string>
-#include <sstream>
-
 namespace pico {
 namespace util {
 namespace csv {
 
     class Row {
-        std::vector<std::string> mData;
+        typedef std::vector<std::string> Cont;
+        Cont mData;
     public:
-        using const_iterator = decltype (mData)::const_iterator;
-        using reference = decltype (mData)::reference;
+        typedef Cont::iterator iterator;
+        typedef Cont::const_iterator const_iterator;
+
+        typedef Cont::reference reference;
 
         const std::string operator[](size_t index) const {
             return mData[index];
@@ -26,13 +25,13 @@ namespace csv {
             return mData.size();
         }
 
-        const_iterator begin () const {
-            return mData.begin ();
-        }
+        Cont::iterator begin () { return mData.begin (); }
 
-        const_iterator end () const {
-            return mData.end ();
-        }
+        Cont::const_iterator begin () const { return mData.begin (); }
+
+        Cont::iterator end () { return mData.end (); }
+
+        Cont::const_iterator end () const { return mData.end (); }
 
         template<typename Str>
         void ReadLine(Str &str) {
@@ -47,7 +46,6 @@ namespace csv {
             }
         }
 
-    private:
     };
 
 }

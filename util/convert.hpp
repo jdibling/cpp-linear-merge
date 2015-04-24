@@ -8,11 +8,11 @@
 #include <string>
 #include <sstream>
 
-template<typename Val>
-inline Val Convert (const std::string &str) {
+template<typename Out, typename In=std::string>
+inline Out Convert (const In &str) {
   std::stringstream ss;
   ss << str;
-  Val ret;
+  Out ret;
   ss >> ret;
   return ret;
 }
