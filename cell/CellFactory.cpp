@@ -23,7 +23,7 @@ CellPtr CellFactory::CreateInputCell (const std::string &data) const {
 
 CellPtr CellFactory::CreateMergeCell (InputRow const &left, InputRow const &right) const {
   switch (mType) {
-    case Type::Diff: return MakeCell<DiffCell> (left[1], right[1]);
+    case Type::Diff: return MakeCell<DiffCell> (right[0], left[0]);
   }
 }
 
