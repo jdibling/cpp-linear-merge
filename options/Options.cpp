@@ -133,17 +133,26 @@ Options OptionsFactory::Create () const {
 
   if (readGzip) {
     if (leftPath.extension () != ".gz") {
-      fs::path newPath = leftPath.leaf ().string() + ".gz";
+      std::string leftPathStr = leftPath.leaf ();
+      leftPathStr += ".gz";
+      fs::path newPath = leftPathStr;
+//      fs::path newPath = leftPath.leaf ().string() + ".gz";
       leftPath.remove_leaf () /= newPath;
     }
     if (rightPath.extension () != ".gz") {
-      fs::path newPath = rightPath.leaf ().string() + ".gz";
+      std::string rightPathStr = rightPath.leaf ();
+      rightPathStr += ".gz";
+//      fs::path newPath = rightPath.leaf ().string() + ".gz";
+      fs::path newPath = rightPathStr;
       rightPath.remove_leaf () /= newPath;
     }
   }
 
   if (writeGzip && vm.count ("out-file") && outPath.extension () != ".gz") {
-    fs::path newPath = outPath.leaf ().string() + ".gz";
+    std::string outPathStr = outPath.leaf ();
+    outPathStr += ".gz";
+//    fs::path newPath = outPath.leaf ().string() + ".gz";
+    fs::path newPath = outPathStr;
     outPath.remove_leaf () /= newPath;
   }
 
