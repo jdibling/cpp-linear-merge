@@ -99,7 +99,7 @@ Options OptionsFactory::Create () const {
     ("right-file,r", po::value<decltype (rightPath)> (&rightPath), "second file for merging (fq path) [required]")
     ("out-file,o", po::value<decltype (outPath)> (&outPath),
      "output file for merged files (fq path) [optional, default:stdout]")
-    ("log-file,o", po::value<decltype (logPath)> (&logPath),
+    ("log-file,L", po::value<decltype (logPath)> (&logPath),
      "output file for merge log (fq path) [optional, default:stderr]")
     ("read-gzip,z", po::value<bool> (&readGzip)->implicit_value (true)->zero_tokens ()->default_value (false),
      "Input files are gzipped (true|false) [optional, default: false]")
@@ -133,17 +133,17 @@ Options OptionsFactory::Create () const {
 
   if (readGzip) {
     if (leftPath.extension () != ".gz") {
-      fs::path newPath = leftPath.leaf () + ".gz";
+      fs::path newPath = leftPath.leaf ().string() + ".gz";
       leftPath.remove_leaf () /= newPath;
     }
     if (rightPath.extension () != ".gz") {
-      fs::path newPath = rightPath.leaf () + ".gz";
+      fs::path newPath = rightPath.leaf ().string() + ".gz";
       rightPath.remove_leaf () /= newPath;
     }
   }
 
   if (writeGzip && vm.count ("out-file") && outPath.extension () != ".gz") {
-    fs::path newPath = outPath.leaf () + ".gz";
+    fs::path newPath = outPath.leaf ().string() + ".gz";
     outPath.remove_leaf () /= newPath;
   }
 
