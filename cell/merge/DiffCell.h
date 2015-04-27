@@ -19,10 +19,16 @@ public:
     return Convert<std::string> (Diff ());
   }
 
-  uint64_t Diff () const {
+  int64_t Diff () const {
     const UIntCell &left = static_cast <const UIntCell &> (Orig (Side::Left));
     const UIntCell &right = static_cast <const UIntCell &> (Orig (Side::Right));
-    return left.Val () - right.Val ();
+    const uint64_t leftVal = left.Val ();
+    const uint64_t rightVal = right.Val ();
+    if (rightVal <= leftVal)
+      return static_cast <int64_t> (leftVal-rightVal);
+    else
+      return -(static_cast <int64_t> (rightVal-leftVal));
+//    return left.Val () - right.Val ();
   }
 
   bool operator== (const Cell &) const {

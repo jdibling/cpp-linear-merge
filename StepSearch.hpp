@@ -46,57 +46,79 @@ StepSearchResults StepSearch (const Rows::const_iterator leftBegin,
     return StepSearchResults (leftBegin, rightBegin, SearchSide::Neither);
   }
 
-  // the rows we're testing for equality
-  Rows::const_iterator leftIt = leftBegin;
-  Rows::const_iterator rightIt = rightBegin;
-
-  const InputRow &leftAnchor = *leftBegin;
-  const InputRow &rightAnchor = *rightBegin;
-
-  // continue stepping until we reach the last element on both sides
-  const Rows::const_iterator leftLastIt = std::prev (leftEnd);
-  const Rows::const_iterator rightLastIt = std::prev (rightEnd);
-  while (!(leftIt == leftLastIt && rightIt == rightLastIt)) {
-    const InputRow &leftRow = *leftIt;
-    const InputRow &rightRow = *rightIt;
-
-    // if we aren't looking for the *first* sync point,
-    // check to see if we found a match by advancing both
-    // iterators
-    if (!isFirstSync) {
-      if (Equ (leftRow, rightRow, columns)) {
-        return StepSearchResults (leftIt, rightIt, SearchSide::Both);
-      }
-    }
-
-    // iterators pointing to the last element on each side
-    const bool leftAnchorIsLast = (leftBegin == leftLastIt);
-    const bool leftItIsLast = (leftIt == leftLastIt);
-    const bool rightAnchorIsLast = (rightBegin == rightLastIt);
-    const bool rightItIsLast = (rightIt == rightLastIt);
-
-    // advance the left and test against the right anchor
-    if (!leftAnchorIsLast && !leftItIsLast) {
-      leftIt = std::next (leftIt);
-      if (Equ (*leftIt, rightAnchor, columns)) {
-        // we found a match by advanccing the left side
-        return StepSearchResults (leftIt, rightBegin, SearchSide::Left);
-      }
-    }
-
-    // now advance the right and test against the left anchor
-    if (!rightAnchorIsLast && !rightItIsLast) {
-      rightIt = std::next (rightIt);
-      if (Equ (leftAnchor, *rightIt, columns)) {
-        // we found a match by advancing the right side
-        return StepSearchResults (leftBegin, rightIt, SearchSide::Right);
-      }
+  // Iterate the left side, see if we can find a match
+  for (Rows::const_iterator anchorIt = rightBegin, leftIt = leftBegin;
+    leftIt != leftEnd;
+    ++leftIt)
+  {
+    if (Equ (*leftIt, *anchorIt, columns))
+    {
+      return StepSearchResults (leftIt, anchorIt, SearchSide::Left);
     }
   }
 
-  // if we have gotten here, then we have reached the end of both files
-  // without finding a match.  We report that both sides were advanced.
-  return StepSearchResults (leftIt, rightIt, SearchSide::Both);
+  // Iterate the right side, see if we can find a match
+  for (Rows::const_iterator anchorIt = leftBegin, rightIt = rightBegin;
+       rightIt != rightEnd;
+       ++rightIt)
+  {
+    if (Equ (*anchorIt, *rightIt, columns))
+    {
+      return StepSearchResults (anchorIt, rightIt, SearchSide::Left);
+    }
+  }
+
+//  // the rows we're testing for equality
+//  Rows::const_iterator leftIt = leftBegin;
+//  Rows::const_iterator rightIt = rightBegin;
+//
+//  const InputRow &leftAnchor = *leftBegin;
+//  const InputRow &rightAnchor = *rightBegin;
+//
+//  // continue stepping until we reach the last element on both sides
+//  const Rows::const_iterator leftLastIt = std::prev (leftEnd);
+//  const Rows::const_iterator rightLastIt = std::prev (rightEnd);
+//  while (!(leftIt == leftLastIt && rightIt == rightLastIt)) {
+//    const InputRow &leftRow = *leftIt;
+//    const InputRow &rightRow = *rightIt;
+//
+//    // if we aren't looking for the *first* sync point,
+//    // check to see if we found a match by advancing both
+//    // iterators
+//    if (!isFirstSync) {
+//      if (Equ (leftRow, rightRow, columns)) {
+//        return StepSearchResults (leftIt, rightIt, SearchSide::Both);
+//      }
+//    }
+//
+//    // iterators pointing to the last element on each side
+//    const bool leftAnchorIsLast = (leftBegin == leftLastIt);
+//    const bool leftItIsLast = (leftIt == leftLastIt);
+//    const bool rightAnchorIsLast = (rightBegin == rightLastIt);
+//    const bool rightItIsLast = (rightIt == rightLastIt);
+//
+//    // advance the left and test against the right anchor
+//    if (!leftAnchorIsLast && !leftItIsLast) {
+//      leftIt = std::next (leftIt);
+//      if (Equ (*leftIt, rightAnchor, columns)) {
+//        // we found a match by advanccing the left side
+//        return StepSearchResults (leftIt, rightBegin, SearchSide::Left);
+//      }
+//    }
+//
+//    // now advance the right and test against the left anchor
+//    if (!rightAnchorIsLast && !rightItIsLast) {
+//      rightIt = std::next (rightIt);
+//      if (Equ (leftAnchor, *rightIt, columns)) {
+//        // we found a match by advancing the right side
+//        return StepSearchResults (leftBegin, rightIt, SearchSide::Right);
+//      }
+//    }
+//  }
+//
+//  // if we have gotten here, then we have reached the end of both files
+//  // without finding a match.  We report that both sides were advanced.
+//  return StepSearchResults (leftIt, rightIt, SearchSide::Both);
 };
 
 #endif //LMERGE_STEPSEARCH_HPP
