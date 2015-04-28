@@ -25,6 +25,7 @@ public:
   OStreamPtr mLogStream;
   bool mWriteOrphans;
   bool mWriteMatches;
+  bool mTrimOrphans; // if true, don't report orphans occuring at the beginning or end of the input
 };
 
 class OptionsFactory {

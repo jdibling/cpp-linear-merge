@@ -39,7 +39,17 @@ StepSearchResults StepSearch (const Rows::const_iterator leftBegin,
                               const Rows::const_iterator rightBegin,
                               const Rows::const_iterator rightEnd,
                               const Columns &columns,
-                              bool isFirstSync) {
+                              bool isFirstSync)
+{
+  // if we're past the end on either side, then all the remaining elements from the other side are orphans
+  if (leftBegin == leftEnd)
+  {
+    return StepSearchResults (leftEnd, rightEnd, SearchSide::Right);
+  }
+  if (rightBegin == rightEnd)
+  {
+    return StepSearchResults (leftEnd, rightEnd, SearchSide::Left);
+  }
   // initial test for equality
   if (Equ (*leftBegin, *rightBegin, columns)) {
     // match found at beginning
@@ -67,6 +77,9 @@ StepSearchResults StepSearch (const Rows::const_iterator leftBegin,
       return StepSearchResults (anchorIt, rightIt, SearchSide::Left);
     }
   }
+
+  // We never found a match
+  return StepSearchResults (leftEnd, rightEnd, SearchSide::Both);
 
 //  // the rows we're testing for equality
 //  Rows::const_iterator leftIt = leftBegin;

@@ -79,6 +79,7 @@ Options OptionsFactory::Create () const {
   Options ret;
   ret.mTerminate = false;
   ret.mReturnCode = 0;
+  ret.mTrimOrphans = true;
 
 //  std::string leftPath;
 //  std::string rightPath;

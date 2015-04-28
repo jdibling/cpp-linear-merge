@@ -31,15 +31,6 @@ typedef io::filtering_istream istream;
 
 namespace csv = pico::util::csv;
 
-namespace {
-  std::unique_ptr<istream> OpenFile (const fs::path &path) {
-    std::unique_ptr<istream> ret = pstd::make_unique<io::filtering_istream> ();
-    io::file_source fileSource (path.string ());
-    ret->push (fileSource);
-    return ret;
-  }
-
-}
 
 int main (int argc, char **argv) {
   OptionsFactory optionsFactory (argc, argv);
@@ -132,10 +123,17 @@ int main (int argc, char **argv) {
        !(leftRowIt == leftEnd && rightRowIt == rightEnd);
        firstSearch = false
     ) {
-    const bool atLeftEnd = (leftRowIt == leftEnd);
-    const bool atRightEnd = (rightRowIt == rightEnd);
+    const bool leftAtEnd = leftRowIt == std::end (leftInput);
+    const bool rightAtEnd = rightRowIt == std::end (rightInput);
+
     const InputRow &leftRow = *leftRowIt;
     const InputRow &rightRow = *rightRowIt;
+
+    const std::string leftSeq = (leftAtEnd ? "end" : leftRow[1].Repr ());
+    const std::string rightSeq = (rightAtEnd ? "end" : rightRow[1].Repr ());
+
+    if (leftSeq == "21130741")
+      bool bk = true;
 
     StepSearchResults stepSearchRetVal = StepSearch (leftRowIt, leftEnd, rightRowIt, rightEnd, inputColumns,
                                                      firstSearch);
@@ -153,13 +151,17 @@ int main (int argc, char **argv) {
       }
 
       // report the orphans
-      leftOrphans += std::distance (firstOrphan, lastOrphan);
-      if (options.mWriteOrphans) {
-        for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
-          const InputRow &orphanRow = *orphan;
-          OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (orphanRow, boost::none);
-          OutputRow &outRow = *outRowPtr;
-          (*options.mOutputStream) << outRow << std::endl;
+      const bool orphanIsAtEnd = (firstOrphan == std::begin (leftInput) || lastOrphan == std::end (leftInput));
+
+      if ((orphanIsAtEnd && !options.mTrimOrphans) || !orphanIsAtEnd) {
+        leftOrphans += std::distance (firstOrphan, lastOrphan);
+        if (options.mWriteOrphans) {
+          for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
+            const InputRow &orphanRow = *orphan;
+            OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (orphanRow, boost::none);
+            OutputRow &outRow = *outRowPtr;
+            (*options.mOutputStream) << outRow << std::endl;
+          }
         }
       }
     }
@@ -176,22 +178,27 @@ int main (int argc, char **argv) {
         lastOrphan == std::prev (lastOrphan);
       }
 
-      // report the orphans
-      rightOrphans += std::distance (firstOrphan, lastOrphan);
-      if (options.mWriteOrphans) {
-        for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
-          const InputRow &orphanRow = *orphan;
-          OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (boost::none, orphanRow);
-          OutputRow &outRow = *outRowPtr;
+      const bool orphanIsAtEnd = (firstOrphan == std::begin (rightInput) || lastOrphan == std::end (rightInput));
 
-          (*options.mOutputStream) << outRow << std::endl;
+      // report the orphans
+      if ((orphanIsAtEnd && !options.mTrimOrphans) || !orphanIsAtEnd) {
+        rightOrphans += std::distance (firstOrphan, lastOrphan);
+        if (options.mWriteOrphans) {
+          for (auto orphan = firstOrphan; orphan != lastOrphan; ++orphan) {
+            const InputRow &orphanRow = *orphan;
+            OutputRowPtr outRowPtr = outRowFactory.CreateOutputRow (boost::none, orphanRow);
+            OutputRow &outRow = *outRowPtr;
+
+            (*options.mOutputStream) << outRow << std::endl;
+          }
         }
       }
     }
 
     // now report the match, if there is one
     if (options.mWriteMatches) {
-      if (!atLeftEnd && !atRightEnd) {
+      if (stepSearchRetVal.mLeftIt != leftEnd && stepSearchRetVal.mRightIt != rightEnd)
+      {
         const InputRow &leftMatch = *stepSearchRetVal.mLeftIt;
         const InputRow &rightMatch = *stepSearchRetVal.mRightIt;
 
@@ -203,18 +210,32 @@ int main (int argc, char **argv) {
     }
 
     // advance and iterate
-    if (!atLeftEnd) {
+    leftRowIt = stepSearchRetVal.mLeftIt;
+    if (leftRowIt != leftEnd) {
       leftRowIt = std::next (stepSearchRetVal.mLeftIt);
+      bool atEnd = leftRowIt == leftEnd;
+      if (atEnd)
+        bool bk = true;
     }
-    if (!atRightEnd) {
+    rightRowIt = stepSearchRetVal.mRightIt;
+    if (rightRowIt != rightEnd) {
       rightRowIt = std::next (stepSearchRetVal.mRightIt);
+      bool atEnd = rightRowIt == rightEnd;
+      if (atEnd)
+        bool bk = true;
     }
   }
 
-  LStr << "Left orphans: " << leftOrphans << "\n"
-  << "Right orphans: " << rightOrphans << "\n"
-  << "Total orphans: " << leftOrphans + rightOrphans
-  << std::endl;
+  LStr << "Left rows: " << leftInput.size() << std::endl;
+  if (leftOrphans > 0)
+    LStr << "Left orphans: " << leftOrphans << std::endl;
+  else
+    LStr << "No orphans on left." << std::endl;
+  LStr << "Right rows: " << rightInput.size() << std::endl;
+  if (rightOrphans > 0)
+    LStr << "Right orphans: " << rightOrphans << std::endl;
+  else
+    LStr << "No orphans on right." << std::endl;
 
   return 0;
 
