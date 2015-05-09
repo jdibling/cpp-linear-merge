@@ -9,6 +9,8 @@
 #include "row/RowUtils.hpp"
 #include "column/Column.hpp"
 
+static const std::string MatchingAlgoVersion = "StepSearch 2.0";
+
 enum class SearchSide {
   Left,
   Right,
@@ -34,6 +36,23 @@ struct StepSearchResults {
  * StepSearch algorithm
  */
 
+Rows::const_iterator SearchOneSide (const InputRow& staticRow, 
+                                    Rows::const_iterator movingBegin,
+                                    Rows::const_iterator movingEnd,
+                                    const Columns& columns)
+{
+  // look for a match by advancing the moving iterator and comparing to the static row
+  for (Rows::const_iterator currentRowIt = movingBegin;
+      currentRowIt != movingEnd;
+      ++currentRowIt)
+  {
+    const InputRow& currentRow = *currentRowIt;
+    if (Equ (staticRow, currentRow, columns))
+        return currentRowIt;
+  }
+  return movingEnd;
+}
+
 StepSearchResults StepSearch (const Rows::const_iterator leftBegin,
                               const Rows::const_iterator leftEnd,
                               const Rows::const_iterator rightBegin,
@@ -41,97 +60,123 @@ StepSearchResults StepSearch (const Rows::const_iterator leftBegin,
                               const Columns &columns,
                               bool isFirstSync)
 {
-  // if we're past the end on either side, then all the remaining elements from the other side are orphans
-  if (leftBegin == leftEnd)
+  // DEBUG
+  const std::string firstLeftSeq = (leftBegin != leftEnd) ? (*leftBegin)[1].Repr() : "<end>";
+  const std::string firstRightSeq = (rightBegin != rightEnd) ? (*rightBegin)[1].Repr() : "<end>";
+  // \DEBUG
+  
+  // quick test for equality (normal case)
+  if (Equ (*leftBegin, *rightBegin, columns))
   {
-    return StepSearchResults (leftEnd, rightEnd, SearchSide::Right);
-  }
-  if (rightBegin == rightEnd)
-  {
-    return StepSearchResults (leftEnd, rightEnd, SearchSide::Left);
-  }
-  // initial test for equality
-  if (Equ (*leftBegin, *rightBegin, columns)) {
-    // match found at beginning
     return StepSearchResults (leftBegin, rightBegin, SearchSide::Neither);
   }
 
-  // Iterate the left side, see if we can find a match
-  for (Rows::const_iterator anchorIt = rightBegin, leftIt = leftBegin;
-    leftIt != leftEnd;
-    ++leftIt)
+  // advance the left iterator to see if we can match the right begin
+  const Rows::const_iterator  matchMovingLeft = SearchOneSide (*rightBegin, std::next (leftBegin), leftEnd, columns);
+  // advance the right iterator to see if we can match the left begin
+  const Rows::const_iterator matchMovingRight = SearchOneSide (*leftBegin, std::next (rightBegin), rightEnd, columns);
+  
+  // if they both found a match, use the one that moved the least
+  const bool foundMovingLeft = (matchMovingLeft != leftEnd);
+  const bool foundMovingRight = (matchMovingRight != rightEnd);
+
+  // DEBUG
+  const std::string leftMoveSeq = (foundMovingLeft ? (*matchMovingLeft)[1].Repr() : "");
+  const std::string rightMoveSeq = (foundMovingRight ? (*matchMovingRight)[1].Repr() : "");
+  // \DEBUG
+  
+  if (foundMovingLeft && foundMovingRight)
   {
-    if (Equ (*leftIt, *anchorIt, columns))
-    {
-      return StepSearchResults (leftIt, anchorIt, SearchSide::Left);
-    }
+    const size_t leftDistance = std::distance (leftBegin, matchMovingLeft);
+    const size_t rightDistance = std::distance (rightBegin, matchMovingRight);
+    if (leftDistance <= rightDistance)
+      return StepSearchResults (matchMovingLeft, rightBegin, SearchSide::Left);
+    else
+      return StepSearchResults (leftBegin, matchMovingRight, SearchSide::Right);
   }
 
-  // Iterate the right side, see if we can find a match
-  for (Rows::const_iterator anchorIt = leftBegin, rightIt = rightBegin;
-       rightIt != rightEnd;
-       ++rightIt)
+  // if we found a match at all, use the one that moved
+  if (foundMovingLeft)
   {
-    if (Equ (*anchorIt, *rightIt, columns))
-    {
-      return StepSearchResults (anchorIt, rightIt, SearchSide::Left);
-    }
+    return StepSearchResults (matchMovingLeft, rightBegin, SearchSide::Left);
+  }
+  if (foundMovingRight)
+  {
+    return StepSearchResults (leftBegin, matchMovingRight, SearchSide::Right);
   }
 
-  // We never found a match
+  // if we didn't find a match at all, we need to move both sides in order to find a match
+  
+  /***
+   * We'll perform an iterative search.
+   * 
+   * Step 1) First, we'll set 'anchor points' on each side, one element past the beginning 
+   * of the document.
+   * 
+   * Step 2) Next, We will search the entire right side for a match with the left anchor point.  
+   * If we find a match, we're done & we return the results, indicating both sides moved.
+   *
+   * Step 3) Then we will search the entire left side for a match with the right anchor point,
+   * returning if we do find a match.
+   *
+   * Step 4) If we couldn't find a match in either case, we will then advance both anchor points 
+   * and repeat steps 2 & 3 again.  
+   *
+   * Continue to loop like this until either we find a match or we roll one of the anchor points 
+   * past the end of the document -- in which case we indicate no match found.
+   *
+   */
+
+  // Set our initial anchor points.
+  const Rows::const_iterator leftAnchorBeginIt = std::next (leftBegin);
+  const Rows::const_iterator rightAnchorBeginIt = std::next (rightBegin);
+
+  for ( Rows::const_iterator leftAnchorIt = leftAnchorBeginIt,
+          rightAnchorIt = rightAnchorBeginIt;
+        (leftAnchorIt != leftEnd) && (rightAnchorIt != rightEnd);
+        ++leftAnchorIt, ++rightAnchorIt)
+  {
+    const InputRow& leftAnchor = *leftAnchorIt;
+    const InputRow& rightAnchor = *rightAnchorIt;
+
+    // DEBUG
+    const std::string leftAnchorSeq = leftAnchor[1].Repr();
+    const std::string rightAnchorSeq = rightAnchor[1].Repr();
+    // \DEBUG
+    
+    // Search the entire right side for a match with the left anchor
+    const Rows::const_iterator iterMatchMovingRightIt = SearchOneSide (leftAnchor, rightAnchorIt, rightEnd, columns);
+    if (iterMatchMovingRightIt != rightEnd)
+    {
+      // DEBUG
+      const std::string leftMatchSeq = leftAnchorSeq;
+      const std::string rightMatchSeq = (*iterMatchMovingRightIt)[1].Repr();
+      // \DEBUG
+      
+      // We found a match      
+      return StepSearchResults (leftAnchorIt, iterMatchMovingRightIt, SearchSide::Both);
+    }
+
+    // Search the entire left side for a match with the right anchor
+    const Rows::const_iterator iterMatchMovingLeftIt = SearchOneSide (rightAnchor, leftAnchorIt, leftEnd, columns);
+    if (iterMatchMovingLeftIt != leftEnd)
+    {
+      // DEBUG
+      const std::string leftMatchSeq = (*iterMatchMovingLeftIt)[1].Repr();
+      const std::string rightMatchSeq = rightAnchorSeq;
+      // \DEBUG
+      
+      // We found a match
+      return StepSearchResults (iterMatchMovingLeftIt, rightAnchorIt, SearchSide::Both);
+    }
+
+    // If we get to here, we advancce both anchors and try again
+  }
+
+  // If we get to here, there are no more matches in the entire file.
+  // Return total failure, indicated by passing end iterators for 
+  // both sides and indicating both sides moved.
   return StepSearchResults (leftEnd, rightEnd, SearchSide::Both);
-
-//  // the rows we're testing for equality
-//  Rows::const_iterator leftIt = leftBegin;
-//  Rows::const_iterator rightIt = rightBegin;
-//
-//  const InputRow &leftAnchor = *leftBegin;
-//  const InputRow &rightAnchor = *rightBegin;
-//
-//  // continue stepping until we reach the last element on both sides
-//  const Rows::const_iterator leftLastIt = std::prev (leftEnd);
-//  const Rows::const_iterator rightLastIt = std::prev (rightEnd);
-//  while (!(leftIt == leftLastIt && rightIt == rightLastIt)) {
-//    const InputRow &leftRow = *leftIt;
-//    const InputRow &rightRow = *rightIt;
-//
-//    // if we aren't looking for the *first* sync point,
-//    // check to see if we found a match by advancing both
-//    // iterators
-//    if (!isFirstSync) {
-//      if (Equ (leftRow, rightRow, columns)) {
-//        return StepSearchResults (leftIt, rightIt, SearchSide::Both);
-//      }
-//    }
-//
-//    // iterators pointing to the last element on each side
-//    const bool leftAnchorIsLast = (leftBegin == leftLastIt);
-//    const bool leftItIsLast = (leftIt == leftLastIt);
-//    const bool rightAnchorIsLast = (rightBegin == rightLastIt);
-//    const bool rightItIsLast = (rightIt == rightLastIt);
-//
-//    // advance the left and test against the right anchor
-//    if (!leftAnchorIsLast && !leftItIsLast) {
-//      leftIt = std::next (leftIt);
-//      if (Equ (*leftIt, rightAnchor, columns)) {
-//        // we found a match by advanccing the left side
-//        return StepSearchResults (leftIt, rightBegin, SearchSide::Left);
-//      }
-//    }
-//
-//    // now advance the right and test against the left anchor
-//    if (!rightAnchorIsLast && !rightItIsLast) {
-//      rightIt = std::next (rightIt);
-//      if (Equ (leftAnchor, *rightIt, columns)) {
-//        // we found a match by advancing the right side
-//        return StepSearchResults (leftBegin, rightIt, SearchSide::Right);
-//      }
-//    }
-//  }
-//
-//  // if we have gotten here, then we have reached the end of both files
-//  // without finding a match.  We report that both sides were advanced.
-//  return StepSearchResults (leftIt, rightIt, SearchSide::Both);
 };
 
 #endif //LMERGE_STEPSEARCH_HPP

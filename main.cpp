@@ -31,8 +31,12 @@ typedef io::filtering_istream istream;
 
 namespace csv = pico::util::csv;
 
+static const std::string AppVersion = "lmerge 1.1";
 
-int main (int argc, char **argv) {
+int main (int argc, char **argv) 
+{
+  std::cout << AppVersion << "\t(" << MatchingAlgoVersion << ")\n";
+
   OptionsFactory optionsFactory (argc, argv);
   const Options options = optionsFactory.Create ();
   if (options.mTerminate) {
