@@ -9,7 +9,7 @@
 #include "row/RowUtils.hpp"
 #include "column/Column.hpp"
 
-static const std::string MatchingAlgoVersion = "StepSearch 2.0";
+static const std::string MatchingAlgoVersion = "StepSearch 2.1";
 
 enum class SearchSide {
   Left,
@@ -89,6 +89,24 @@ StepSearchResults StepSearch (const Rows::const_iterator leftBegin,
   {
     const size_t leftDistance = std::distance (leftBegin, matchMovingLeft);
     const size_t rightDistance = std::distance (rightBegin, matchMovingRight);
+    /*** Assume the right side is cannonical.
+     * In other words, we expect that every pattern we see on the right
+     * side is expected to be found on the left side, excepting for orphans
+     * on the left.
+     *
+     * We still need to be able to detect when there is a legitimate orphan
+     * in the cannonical side, so we'll set a threshhold that needs to be
+     * breached before we match by advancing the cannonical side.
+     */
+    static const size_t cannonicalThreshhold = 20;
+    if (rightDistance < cannonicalThreshhold)
+    {
+      // cann. threshhold not breached -- advance the left
+      // regardless of distance
+      return StepSearchResults (matchMovingLeft, rightBegin, SearchSide::Left);
+    }
+
+    // threshhold breached -- advance whichever moved the least
     if (leftDistance <= rightDistance)
       return StepSearchResults (matchMovingLeft, rightBegin, SearchSide::Left);
     else
